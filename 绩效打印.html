@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月度工作考核表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+
+        .header-info,
+        .header-flex {
+            text-align: center;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .header-info .year-month,
+        .header-info .org,
+        .header-flex {
+            font-weight: bold;
+        }
+
+        .header-info .year-month {
+            font-size: 14px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            text-align: left;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 4px 6px;
+            text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .task-name {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .standard-content {
+            text-align: left;
+            padding-left: 6px;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .status-input {
+            width: 100%;
+            min-height: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-size: 12px;
+            padding: 4px;
+            resize: none;
+            overflow: hidden;
+            font-family: inherit;
+            line-height: 1.5;
+            display: block;
+            box-sizing: border-box;
+            field-sizing: content;
+        }
+
+        .status-input:focus,
+        .score-input:focus {
+            outline: none;
+            background: #fffde7;
+        }
+
+        .score-input {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 12px;
+            padding: 0;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .score-input::-webkit-outer-spin-button,
+        .score-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        td:has(.status-input),
+        td:has(.score-input) {
+            padding: 0;
+            height: 1px;
+        }
+
+        .signature-section {
+            margin-top: -1px;
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .signature-table {
+            border-top: none;
+            border-bottom: none;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .signature-table tr {
+            display: table-row;
+        }
+
+        .signature-table td {
+            padding: 8px 5px;
+            font-size: 12px;
+            max-width: none !important;
+            width: auto;
+        }
+
+        .notes-bottom {
+            margin-top: -1px;
+            border: 1px solid #333;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .notes-bottom h4 {
+            color: #d32f2f;
+            font-size: 12px;
+            margin: 6px 0 3px 0;
+        }
+
+        .notes-bottom ol,
+        .notes-bottom ul {
+            margin-left: 22px;
+        }
+
+        .notes-bottom p {
+            margin: 3px 0;
+        }
+
+        .submit-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            padding: 12px 48px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(17, 153, 142, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .notes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: -1px 0;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+
+        .notes-table th {
+            height: 35px;
+        }
+
+        .notes-table th,
+        .notes-table td {
+            border: 1px solid #000;
+            white-space: normal;
+        }
+
+        .notes-table td {
+            padding: 1px;
+            text-align: left !important;
+            vertical-align: top !important;
+        }
+
+        .signature-col-1,
+        .signature-col-2 {
+            text-align: left !important;
+            padding: 5px 20px !important;
+        }
+
+        .notes-table ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .notes-table p {
+            text-indent: 0;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm;
+                orphans: 4;
+                widows: 4;
+            }
+
+            body {
+                background: #fff;
+                padding: 0;
+                font-size: 11px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 16px;
+                margin-bottom: 3px;
+            }
+
+            .header-info,
+            .header-flex {
+                font-size: 11px;
+                margin: 3px 0;
+            }
+
+            .header-info .year-month {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 2px 4px;
+                font-size: 10px;
+            }
+
+            th {
+                background: #f0f0f0 !important;
+            }
+
+            .notes-table th {
+                background: #c4c3c3 !important;
+            }
+
+            .status-input,
+            .score-input {
+                font-size: 10px;
+                padding: 2px;
+            }
+
+            .standard-content {
+                font-size: 10px;
+                line-height: 1.4;
+            }
+
+            input {
+                border: none !important;
+            }
+
+            .notes-table th,
+            .notes-table td {
+                padding: 3px 5px;
+                font-size: 10px;
+            }
+
+            .signature-table td {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+
+            .submit-section {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>广州市阳光天使社会工作服务中心</h1>
+            <div class="header-info"><span id="headerTitle" style="font-size: 15px;"></span></div>
+            <div class="header-flex">
+                <span id="checkerInfo"></span>
+                <span id="nameInfo"></span>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table id="mainTable">
+                <thead>
+                    <tr id="tableHeadRow">
+                        <th>序号</th>
+                        <th>任务类别</th>
+                        <th>工作任务与内容</th>
+                        <th>考核标准</th>
+                        <th>完成情况</th>
+                        <th>标准分</th>
+                        <th>权重(%)</th>
+                        <th id="scoreHeader1">自评分(30%)</th>
+                        <th id="scoreHeader2">上级领导评分(70%)</th>
+                        <th id="scoreHeader3" style="display:none;"></th>
+                        <th>考核评语</th>
+                        <th>实际考核分值</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- 签名区 -->
+        <div class="signature-section">
+            <table class="signature-table">
+                <tr>
+                    <td class="signature-col-1">被考核人签名：<span id="assessedName"></span></td>
+                    <td class="signature-col-2" id="leaderSignatureText">上级领导签名：<span id="leaderName"></span></td>
+                </tr>
+                <tr>
+                    <td class="signature-col-1">日期：<span style="display:inline-block; width:10px;"></span>
+                        <span id="updateYear" style="display:inline-block; width:20px;"></span>年
+                        <span id="updateMonth" style="display:inline-block; width:20px;"></span>月
+                        <span id="updateDay" style="display:inline-block; width:20px;"></span>日
+                    </td>
+                    <td class="signature-col-2">日期：<span style="display:inline-block; width:10px;"></span>
+                        <span id="finishYear" style="display:inline-block; width:20px;"></span>年
+                        <span id="finishMonth" style="display:inline-block; width:20px;"></span>月
+                        <span id="finishDay" style="display:inline-block; width:20px;"></span>日
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- 说明区（底部） -->
+        <table class="notes-table">
+            <tr>
+                <th colspan="2" style="text-align:center;background:#c4c3c3;">相关说明</th>
+            </tr>
+            <tr>
+                <td rowspan="3" style="width:8%;vertical-align: middle !important;text-align: center !important;">
+                    <p><strong>项目填写</strong></p>
+                </td>
+                <td>
+                    <p>1、指标量是指项目点按年度指标分解成月度指标，再由月度指标量分解到每人的指标量，本月内必须要完成的工作量；本职职能考核是（本岗）每月必须完成的基础类工作。
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>2、"完成情况"是指各项工作任务完成的结果，被考核员工须自行填写具体、详细的工作完成情况，如当月完成xx活动xx场次，完成个案记录x份……不能简单填写"已完成"。
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>3、"标准分"是指每项工作任务根据其重要性赋予的分值，标准分总和为100分；任务类别中的各项工作任务标准分之和不能超过规定分值。
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2" style="vertical-align: middle !important;text-align: center !important;">
+                    <p><strong>评分说明</strong></p>
+                </td>
+                <td>
+                    <p>评分结果：得分在98分及以上：达成目标并有所超越；90≤得分＜98分（不含98分）：基本达成目标；80≤得分＜90分：基本达成目标，但有所不足；70≤得分＜80分：离目标存在明显差距；得分在70分以下：没有完成岗位职责，为不及格。连续3个月考核分为不及格，视为不能胜任该工作岗位，机构会采取相关措施，包括：进行针对性培训、要求整改、调整岗位、降低薪酬、提出辞退警告等。
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>评分结果: 系数 1.2（98～110分） 1（90≤得分＜98分） 0.8（80≤得分＜90分）
+                        0.5（70≤得分＜80分）0（70分以下），评分结果对应的系数*该员工的月度绩效工资金额，所得金额为该员工当月实际所得的绩效工资。例如，张小明的工资构成为：基本工资+岗位工资+绩效工资=5000元，其中绩效工资为1000元，张小明在8月份的考核成绩为93分，其绩效工资则为1000元×1=1000元，无变动。若张小明的考核成绩为99分，则绩效工资为1000元×1.2=1000元，奖励200元。若张小明的绩效成绩为82分，绩效工资则为1000×0.8=800元，扣罚200元。
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="1" style="vertical-align: middle !important;text-align: center !important;">
+                    <p><strong>要求</strong></p>
+                </td>
+                <td>
+                    <p>1、每月8日前，由各部门/项目点负责人安排项目员工填写完成实际情况、自评得分，项目点主任按需结合员工面谈填写"上级评分"后汇总项目点所有人员绩效总表，把电子版发给行政部；行政部收集完毕后统一发给首席执行官评核，其中项目点主任本人填写好自评分，由首席执行官填写"上级评分"。
+                        2、因自评人迟交评分表扣本人5分/天，超过三天扣20分。
+                        3、因评分人迟交评分表扣评分人5分/天，超过三天扣20分。
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <div style="margin-top:8px;text-align:left;text-indent:6em;font-size:15px;line-height:2;">
+            <p>本人已知悉以上考核全部内容</p>
+            <p>员工签名：<span style="display:inline-block; width:200px;"></span>日期：</p>
+        </div>
+
+        <script>
+            // ============ 核心数据：从 form 参数读取 ============
+            const form = {
+                "leader": "陈淑玲",
+                "leaderid": "ddd8cbf6",
+                "name": "曾健乾",
+                "userid": "473e4794",
+                "任务分段": "2|1|3",
+                "任务类别": "本职职能考核(60分)|岗位规范（5分）|项目管理\n\n（30分）",
+                "岗位": "专项负责人",
+                "工作任务与内容": "恒常工作指标完成情况|工作产出质量|工作规范|行政管理|团队管理|团队带领",
+                "标准分": "15|15|20|5|10|5|15",
+                "模版名称": "市桥禁毒项目",
+                "签名处文本": "总监签名：\n\nCEO/COO签名：",
+                "考核标准1": "清晰个人岗位职责，高效统筹项目工作，把控各项工作产出和质量。\n①有效监管团队员工按时按质完成恒常工作指标。根据合同的年度服务指标量总量，分解到每月应该完成的固定指标量，要求100%完成月度指标量，完成80%-99%，此项扣10分，完成79%以下，此项0分。\n②有效监管团队员工按时完成当月服务文书、相关工作记录、报告等。团队中出现2人以上无故拖延文书的，分管副主任和主任此项扣10分。\n③积极响应各项工作，及时回应、及时交代，并高效统筹推进落实。包括正式会议、工作群、口头传达的工作、邮件往来等。\n④积极响应各项工作，并高效统筹推进落实。\n若有团队成员当月绩效考评成绩低于70分，分管副主任和主任在该项考核得分按每位成员直接扣减5分，如此类推。",
+                "考核标准2": "按时按质完成岗位的恒常工作指标，以下各项工作未按时按质完成的，每有一项拖延，每拖延一天扣减2分：\n①每月28日前按时提交项目下月财务预算。\n②每月8日前按时提交上月项目团队绩效考核表格、小项目执行补贴申请等。\n③每月3日前提交上月考勤表。\n④每月25日前按时提交当月财务报销资料。\n⑤每月8日前按时提交上月项目工作总结报告和工作计划至飞书，每周六中午12点前按时提交周报，每月5日前提交项目月度工作总结。\n⑥按时参加机构安排的各项会议和活动，无特殊情况不缺席，因特殊情况缺席需要向高管团队提出申请。（每缺一次机构会议或活动，扣2分）\n⑦机构总部其他需要响应或者提交的资料等。",
+                "考核标准3": "①所提交相关工作文件质量好，能够有效体现个人专业水平与质素，提交督导/总监或采购方来回沟通修改次数少，未出现不满或差评。\n②当月能够主动挖掘社工做得好的服务，鼓励和支持社工撰写案例；\n③能够关注项目服务品牌和亮点打造，有意识带领社工推进品牌服务；\n④对于项目品牌服务或特色亮点能够积极带领社工撰写案例或文章，积极参与各项申报\n⑤对项目工作的推进和改善主动积极思考，提出建设性的意见。\n⑥当月购买方对项目工作投诉或给予差评，经机构核实，若为项目团队工作不足造成，该项为0分。",
+                "考核标准4": "①清晰个人岗位职责；遵守社会工作专业价值和伦理操守。\n②认同并熟悉机构的MVV，遵守机构及项目规章制度、员工守则，严格遵守考勤要求。\n③个人有特殊情况及时沟通，不对项目产生不良影响。\n④积极配合项目服务发展需要、配合上级工作安排并完成相应工作。\n⑤以身作则，以积极向上的工作态度，引领团队对项目和机构有充分、正面的认识，有强的归属感。",
+                "考核标准5": "① 严格落实项目场地安全管理及员工安全维护制度，本月未出现因安全管理不到位引发的安全事故。\n② 规范管理项目办公设备及印章，做到专人保管、依规使用、台账清晰。\n③ 项目严格遵守法律法规，严守工作纪律与保密要求；发生泄密或违规情形，此项得0分。\n④ 遇重大事项、突发事件或异常情况，第一时间向行政部及CEO报备，不迟报、不漏报。\n⑤ 每个项目年至少一次项目内部自查，对发现问题及时整改，持续完善管理。\n",
+                "考核标准6": "① 规范团队日常管理，项目人员按要求着装，维护专业形象。\n② 能够按照人事管理制度参与处理项目人员的入职、转正、离职、辞退、晋升等工作。\n③ 团队成员遵守考勤纪律，无迟到、早退、旷工情况，休假按制度依规申请。",
+                "考核标准7": "①能够以积极正面的态度向团队员工传达工作任务、传递项目服务意义，带领团队员工，有序推进各项工作。\n②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。\n③能够有意识培养团队骨干，根据团队骨干成长计划给予一定支持，每月与骨干复盘检视成长情况。\n④根据项目点的社工成长需求，定期开展共学，给予团队支持。\n⑤针对员工出现的困难和问题，能够通过面谈沟通等方式，有效处理。\n⑥特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n",
+                "表格类型": "主任/专项负责人",
+                "评分人文本": "自评分（20%）|总监评分（40%）|CEO/COO评分（40%）",
+                "项目名称": "石楼社工站"
+            };
+            const data = {
+                "completion": "[\"测试\",\"理，项目人员按要求书\n\n的，\n维护专业形象。 ② 能够按照人事管理制度参与处理项目人员的入职、转正、离职、辞退、晋升等工作。 ③ 团队成员遵守考勤纪律，无迟到、早退、旷工\",\"，带领团队员工，有序推进各项工作。 ②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。 ③能够有意识培养团队骨干，根据团队骨干成长计划给予一定支持，每\",\"机构要求参与督导培训，注重学以致用和学习产出。\\n②积极参与项目或\",\"部资源用于机构服务开展，当月链接各类资源折合3000元以下加1分；当月链接各类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。\",\"大师\",\"a\",\"w\",\"2\"]",
+                "score": "[1,1,2,2,2,2,2,2,2]",
+                "selfScore": "[11,5,11,11,10,10,10,1,1]",
+                "actualScore": "[3,3,2.6,3.6,2.6,3.8,3.8,3.6,1.8]",
+                "comment": "[\"总量，分解到每月应该完成的固定指标量，要求100%完成月度指标量，完成80%-99%，此项扣10分，完成79%以下，此项0分。 ②有效监管团队员工按时完成当月服务文书、相关工作记录、报告等。团队中出现2人以上无故拖延文书的，分管副主任和主任\",\"算。 ②每月8日前按时提交上月项目团队绩效考核表格、小项目执行补贴申请等。 ③每月3日前提交上月考勤表。 ④每月25日前按\",\"素，提交督导/总监或采购方来回沟通修改次数少，未出现不满或差评。 ②当月能够主动挖掘社工做得好的服务，鼓励和支持社工撰写案例； ③能够关注项目服务品牌和亮点\",\"同并熟悉机构的MVV，遵守机构及项目规章制度、员工守则，严格遵守考勤要求。 ③个人有特殊情况及时沟通，不对项目产生不\",\"因安全管理不到位引发的安全事故。 ② 规范管理项目办公设备及印章，做到专人保管、依规\",\"能够按照人事管理制度参与处理项目人员的入职、转正、离职、辞退、晋升等工作。 ③ 团\",\"务意义，带领团队员工，有序推进各项工作。 ②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。 ③能够有\",\"参与督导培训，注重学以致用和学习产出。\\n②积极参与项目或机构组织的共学，有意识的投入学习与提升。\\n③针对工作中存在的不足，能够接纳意见建议，积极学习和改进，\",\"类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。\\n②协助机构总部事务，如招投标、年会活动筹备等且表现良好（\"]",
+                "signatureC": "data:image/jpeg;base64,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",
+                "signatureL": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND",
+                "signature": "",
+                "ceo": "[1,1,2,2,2,2,2,2,2]"
+            }
+            const month = "2026年6月";
+            const finishDay = 1783134477030;
+            const updateDay = 1783134477030;
+
+            // 处理数据格式，将字符串转换为数组
+            function parseDataArray(str) {
+                try {
+                    // 先将实际换行符转义为\n，再处理转义的双引号
+                    str = str.replace(/\n/g, '\\n') //.replace(/\\"/g, '\"');
+                    return JSON.parse(str);
+                } catch (e) {
+                    console.error('数据解析错误:', e);
+                    return [];
+                }
+            }
+
+            // 解析所有数据字段
+            const completionData = parseDataArray(data.completion || '[]');
+            const selfScoreData = parseDataArray(data.selfScore || '[]');
+            const scoreData = parseDataArray(data.score || '[]');
+            const ceoData = parseDataArray(data.ceo || '[]');
+            const commentData = parseDataArray(data.comment || '[]');
+            const actualScoreData = parseDataArray(data.actualScore || '[]');
+
+            // 格式化日期函数
+            const formatDate = (timestamp) => {
+                if (!timestamp) return null;
+                const date = new Date(timestamp);
+                return {
+                    year: date.getFullYear(),
+                    month: date.getMonth() + 1,
+                    day: date.getDate()
+                };
+            };
+
+            // 设置日期到页面
+            const setDateElements = (prefix, dateObj) => {
+                if (!dateObj) return;
+                ['Year', 'Month', 'Day'].forEach(type => {
+                    const el = document.getElementById(`${prefix}${type}`);
+                    if (el) {
+                        el.textContent = dateObj[type.toLowerCase()];
+                        el.style.width = 'auto';
+                    }
+                });
+            };
+
+            // 处理签名日期 - 增加变量存在性检查
+            const updateDate = typeof updateDay !== 'undefined' && updateDay ? formatDate(updateDay) : null;
+            const finishDate = typeof finishDay !== 'undefined' && finishDay ? formatDate(finishDay) : null;
+            setDateElements('update', updateDate);
+            setDateElements('finish', finishDate);
+
+            const orgName = form["项目名称"] || "";
+            const title = month + '（' + orgName + '）' + form["表格类型"] + '月度工作考核表';
+            document.getElementById('headerTitle').textContent = title;
+            document.getElementById('checkerInfo').textContent = '组织部门:行政部';
+
+            // 更新签名处文本
+            const leaderSignatureText = document.getElementById('leaderSignatureText');
+            if (leaderSignatureText && form["签名处文本"]) {
+                const signatureText = form["签名处文本"];
+                if (signatureText.includes('\n')) {
+                    // 包含换行符，拆分为两行
+                    const lines = signatureText.split('\n').map(line => line.trim()).filter(line => line);
+                    let html = '';
+                    if (lines.length > 0) {
+                        html += lines[0] + '<span id="leaderName"></span>';
+                    }
+                    if (lines.length > 1) {
+                        html += '<br>' + lines[1] + '<span id="ceoName"></span>';
+                    }
+                    leaderSignatureText.innerHTML = html;
+                } else {
+                    // 不包含换行符，使用默认格式
+                    leaderSignatureText.innerHTML = signatureText.trim() + '<span id="leaderName"></span>';
+                }
+
+                // 设置上级领导签名
+                const leaderNameElement = document.getElementById('leaderName');
+                // 设置签名图片的通用函数
+                const setSignatureImage = (elementId, signatureSrc, fallbackText = '') => {
+                    const element = document.getElementById(elementId);
+                    if (!element) return;
+
+                    // 检查是否为有效的图片数据
+                    const isValidImage = signatureSrc && (
+                        signatureSrc.startsWith('data:image/') ||
+                        signatureSrc.startsWith('http://') ||
+                        signatureSrc.startsWith('https://')
+                    );
+
+                    if (isValidImage) {
+                        // 图片模式：设置固定高度样式
+                        const baseStyle = {
+                            display: 'inline-block',
+                            verticalAlign: 'middle',
+                            height: '30px',
+                            minHeight: '30px',
+                            position: 'relative'
+                        };
+                        Object.assign(element.style, baseStyle);
+
+                        const img = document.createElement('img');
+                        Object.assign(img.style, {
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain',
+                            verticalAlign: 'middle'
+                        });
+                        img.src = signatureSrc;
+                        img.onerror = () => {
+                            // 图片加载失败：切换到文本模式，移除高度相关样式
+                            element.textContent = fallbackText;
+                            element.style.verticalAlign = '';
+                            element.style.minHeight = '';
+                            element.style.height = '';
+                        };
+                        element.innerHTML = '';
+                        element.appendChild(img);
+                    } else {
+                        // 文本模式：只设置必要的对齐样式，不设置固定高度
+                        if (fallbackText) {
+                            element.textContent = fallbackText;
+                        } else {
+                            element.textContent = '';
+                        }
+                    }
+                };
+
+                // 设置上级领导签名
+                setSignatureImage('leaderName', data["signatureL"], form["leader"]);
+
+                // 设置CEO签名
+                setSignatureImage('ceoName', data["signatureC"]);
+            }
+
+            // 设置被考核人姓名
+            const employeeNameElement = document.getElementById('employeeName');
+            if (employeeNameElement && form["name"]) {
+                employeeNameElement.textContent = form["name"];
+            }
+
+            // 设置被考核人签名
+            const setAssessedSignature = () => {
+                const element = document.getElementById('assessedName');
+                if (!element) return;
+
+                // 检查是否为有效的图片数据
+                const isValidImage = data["signature"] && (
+                    data["signature"].startsWith('data:image/') ||
+                    data["signature"].startsWith('http://') ||
+                    data["signature"].startsWith('https://')
+                );
+
+                if (isValidImage) {
+                    // 图片模式：设置固定高度样式
+                    const baseStyle = {
+                        display: 'inline-block',
+                        verticalAlign: 'middle',
+                        height: '30px',
+                        minHeight: '30px',
+                        position: 'relative'
+                    };
+                    Object.assign(element.style, baseStyle);
+
+                    const img = document.createElement('img');
+                    Object.assign(img.style, {
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        verticalAlign: 'middle'
+                    });
+                    img.src = data["signature"];
+                    img.onerror = () => {
+                        // 图片加载失败：切换到文本模式，移除高度相关样式
+                        element.textContent = form["name"] || '';
+                        element.style.verticalAlign = '';
+                        element.style.minHeight = '';
+                        element.style.height = '';
+                    };
+                    element.innerHTML = '';
+                    element.appendChild(img);
+                } else {
+                    // 文本模式：只设置必要的对齐样式，不设置固定高度
+                    element.textContent = form["name"] || '';
+                }
+            };
+
+            setAssessedSignature();
+
+            // 更新评分人表头
+            if (form["评分人文本"]) {
+                const scoreHeaders = form["评分人文本"].split('|');
+                const scoreHeader3 = document.getElementById('scoreHeader3');
+                if (scoreHeader3) scoreHeader3.style.display = 'none';
+                // 根据数组元素显示并设置对应的表头
+                scoreHeaders.forEach((headerText, index) => {
+                    const headerElement = document.getElementById(`scoreHeader${index + 1}`);
+                    if (headerElement) {
+                        headerElement.textContent = headerText.trim();
+                        headerElement.style.display = 'table-cell';
+                    }
+                });
+
+                // 设置全局标记，指示是否需要生成第三评分列
+                window.showThirdScoreColumn = scoreHeaders.length >= 3;
+
+                // 显示对应数量的内容列
+                const dataRows = document.querySelectorAll('#tableBody tr');
+                dataRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    // 第10列是预留隐藏列（索引从0开始是第9个）
+                    if (cells.length > 9) {
+                        if (window.showThirdScoreColumn) {
+                            cells[9].style.display = 'table-cell';
+                        } else {
+                            cells[9].style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            // 自动计算并匹配签名区列宽
+            const updateSignatureColumnWidths = () => {
+                const mainTable = document.getElementById('mainTable');
+                if (!mainTable) return;
+
+                // 配置项
+                const columnConfig = [
+                    { width: 3, id: null },    // 序号
+                    { width: 5.5, id: null },   // 任务类别
+                    { width: 6.5, id: null },   // 工作任务与内容
+                    { width: 25, id: null },   // 考核标准
+                    { width: 'auto', id: null }, // 完成情况（动态缓冲列）
+                    { width: 5, id: null },    // 标准分
+                    { width: 5, id: null },    // 权重(%)
+                    { width: 7, id: 'scoreHeader1' },   // 自评分(30%)
+                    { width: 7, id: 'scoreHeader2' },   // 上级领导评分(70%)
+                    { width: 7, id: 'scoreHeader3' },   // 第三评分列
+                    { width: 10, id: null },   // 考核评语
+                    { width: 5, id: null }    // 实际考核分值
+                ];
+
+                const isThirdColumnVisible = () => {
+                    const el = document.getElementById('scoreHeader3');
+                    return el && el.style.display !== 'none';
+                };
+
+                // 设置签名图片高度（仅对已加载的图片元素）
+                ['assessedName', 'leaderName', 'ceoName'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element && element.querySelector('img')) {
+                        element.style.height = '30px';
+                        element.style.minHeight = '30px';
+                    }
+                });
+
+                // 计算列宽
+                const calculateColumnWidths = () => {
+                    let fixedTotal = 0;
+                    const visibleThirdColumn = isThirdColumnVisible();
+
+                    columnConfig.forEach((col, index) => {
+                        if (col.width === 'auto') return;
+                        if (index === 9 && !visibleThirdColumn) return;
+                        fixedTotal += col.width;
+                    });
+
+                    const dynamicPercentage = 100 - fixedTotal;
+                    return { fixedTotal, dynamicPercentage, visibleThirdColumn };
+                };
+
+                const { dynamicPercentage, visibleThirdColumn } = calculateColumnWidths();
+
+                // 设置主表格列宽
+                mainTable.querySelectorAll('th').forEach((cell, index) => {
+                    if (index >= columnConfig.length) return;
+                    const col = columnConfig[index];
+
+                    if (index === 9 && !visibleThirdColumn) {
+                        cell.style.display = 'none';
+                        return;
+                    }
+
+                    const width = col.width === 'auto' ? dynamicPercentage : col.width;
+                    cell.style.width = `${width}%`;
+                });
+
+                // 设置签名区列宽
+                const calculateSignatureWidths = () => {
+                    let signature1Percentage = 0;
+                    const visibleThirdColumn = isThirdColumnVisible();
+                    const { dynamicPercentage } = calculateColumnWidths();
+
+                    for (let i = 0; i < 5; i++) {
+                        const col = columnConfig[i];
+                        signature1Percentage += col.width === 'auto' ? dynamicPercentage : col.width;
+                    }
+                    return {
+                        signature1: signature1Percentage,
+                        signature2: 100 - signature1Percentage
+                    };
+                };
+
+                const { signature1, signature2 } = calculateSignatureWidths();
+                document.querySelectorAll('.signature-col-1').forEach(col => col.style.width = `${signature1}%`);
+                document.querySelectorAll('.signature-col-2').forEach(col => col.style.width = `${signature2}%`);
+
+                // 调整KPI容器高度
+                document.querySelectorAll('div[style*="display: flex; width: 100%; height: 100%; align-items: stretch; position: relative;"]').forEach(container => {
+                    const parent = container.parentElement;
+                    if (!parent) return;
+                    const parentHeight = parent.offsetHeight;
+                    if (container.offsetHeight < parentHeight) {
+                        container.style.height = `${parentHeight}px`;
+                    }
+                });
+
+
+            }
+
+            // 页面加载完成后执行
+            window.addEventListener('load', updateSignatureColumnWidths);
+            // 窗口大小变化时重新计算
+            window.addEventListener('resize', updateSignatureColumnWidths);
+
+            // ============ 数据解析与格式化 ============
+            const parsePipeSeparated = (str) => str ? str.split('|').map(s => s.trim()) : [];
+            const parseNumberArray = (str) => str ? str.split('|').map(s => parseInt(s.trim()) || 1) : [];
+
+            // 解析基础数据
+            const categories = parsePipeSeparated(form["任务类别"]);
+            const segments = parseNumberArray(form["任务分段"]);
+            const taskNames = parsePipeSeparated(form["工作任务与内容"]);
+            const scoreList = parsePipeSeparated(form["标准分"]);
+            const kpiItems = parsePipeSeparated(form["KPI细项"]);
+            const kpiCount = kpiItems.length;
+
+            // 补充分段数据
+            while (segments.length < categories.length) segments.push(1);
+
+            // 生成KPI标准HTML
+            const generateKpiStandard = (kpiItem, standardText) => `
+                <div style="display: flex; width: 100%; height: 100%; align-items: stretch; position: relative;">
+                    <div style="width: 30%; text-align: center; padding-right: 5px; display: flex; align-items: center; justify-content: center;">${kpiItem}</div>
+                    <div style="position: absolute; left: 30%; top: 0; bottom: 0; width: 1px; background-color: #333;"></div>
+                    <div style="width: 70%; padding-left: 5px; display: flex; align-items: center;">${standardText}</div>
+                </div>
+            `;
+
+            // 收集所有考核标准
+            const collectStandards = () => {
+                const standards = [];
+
+                // 处理KPI标准
+                if (kpiCount > 0 && form["考核标准1"]) {
+                    const parts = form["考核标准1"].split('|');
+                    for (let i = 0; i < kpiCount; i++) {
+                        standards.push(generateKpiStandard(kpiItems[i] || '', parts[i] || ''));
+                    }
+
+                    // 添加剩余标准
+                    for (let i = 2; i <= 20; i++) {
+                        const key = `考核标准${i}`;
+                        if (form[key]) standards.push(form[key]);
+                        else if (i > 6) break;
+                    }
+                } else {
+                    // 处理普通标准
+                    for (let i = 1; i <= 20; i++) {
+                        const key = `考核标准${i}`;
+                        if (form[key]) standards.push(form[key]);
+                    }
+                }
+
+                return standards;
+            };
+
+            const allStandards = collectStandards();
+
+            // 计算任务行跨度
+            const calculateTaskRowspans = () => {
+                const rowspans = [];
+                let taskIdx = 0;
+
+                for (let c = 0; c < categories.length; c++) {
+                    const taskCount = segments[c];
+                    for (let t = 0; t < taskCount; t++) {
+                        rowspans.push(taskIdx === 0 && kpiCount > 0 ? kpiCount : 1);
+                        taskIdx++;
+                    }
+                }
+
+                return rowspans;
+            };
+
+            const taskRowspans = calculateTaskRowspans();
+
+            // 计算类别行跨度
+            const calculateCategoryRowspans = () => {
+                const rowspans = [];
+                let runningIdx = 0;
+
+                for (let c = 0; c < categories.length; c++) {
+                    let total = 0;
+                    for (let t = 0; t < segments[c]; t++) {
+                        total += taskRowspans[runningIdx] || 1;
+                        runningIdx++;
+                    }
+                    rowspans.push(total);
+                }
+
+                return rowspans;
+            };
+
+            const categoryRowspans = calculateCategoryRowspans();
+
+            // ========== 动态生成表格 (10列) ==========
+            const tbody = document.getElementById('tableBody');
+            let dataIdx = 0, stdIdx = 0, scoreIdx = 0, tIdx = 0, catSeq = 0;
+            tbody.innerHTML = '';
+
+            for (let c = 0; c < categories.length; c++) {
+                catSeq++;
+                const catRowspan = categoryRowspans[c];
+                const totalTaskRows = segments[c];
+                let firstRowInCategory = true;
+
+                for (let t = 0; t < totalTaskRows; t++) {
+                    const taskName = taskNames[tIdx] || '';
+                    const taskRowspan = taskRowspans[tIdx] || 1;
+
+                    const stdRows = [];
+                    for (let sub = 0; sub < taskRowspan; sub++) {
+                        stdRows.push(allStandards[stdIdx + sub] || '');
+                    }
+
+                    for (let sub = 0; sub < taskRowspan; sub++) {
+                        const scoreVal = scoreList[scoreIdx] || '';
+                        const weightVal = scoreVal;
+                        const isFirstRowOfCategory = firstRowInCategory && sub === 0;
+
+                        let rowHTML = '<tr>';
+
+                        // 列1: 序号（按类别合并）
+                        if (isFirstRowOfCategory) {
+                            rowHTML += '<td class="task-name" rowspan="' + catRowspan + '">' + catSeq + '</td>';
+                            firstRowInCategory = false;
+                        }
+
+                        // 列2: 组织部门/工作任务类别（按类别合并）
+                        if (isFirstRowOfCategory) {
+                            const catText = categories[c].replace(/\s*$[^)]*$\s*/g, '').trim();
+                            rowHTML += '<td class="task-name" rowspan="' + catRowspan + '">' + catText + '</td>';
+                        }
+
+                        // 列3: 工作任务与内容（按任务合并）
+                        if (sub === 0) {
+                            if (taskRowspan > 1) {
+                                rowHTML += '<td class="task-name" rowspan="' + taskRowspan + '">' + taskName + '</td>';
+                            } else {
+                                rowHTML += '<td class="task-name">' + taskName + '</td>';
+                            }
+                        }
+
+                        // 列4: 考核标准
+                        let standardCellClass = 'standard-content';
+                        let standardCellStyle = '';
+                        // 如果是KPI相关行，移除padding
+                        if (kpiCount > 0 && c === 0 && t === 0) {
+                            standardCellStyle = 'style="padding: 0px;"';
+                        }
+                        rowHTML += `<td class="${standardCellClass}" ${standardCellStyle}>${stdRows[sub]}</td>`;
+
+                        // 列5: 完成情况 - 调整逻辑：数组元素不足时留空，多余时忽略
+                        const completionVal = dataIdx < completionData.length ? completionData[dataIdx] : '';
+                        rowHTML += '<td data-row="' + dataIdx + '" data-field="completion">';
+                        if (completionVal) {
+                            rowHTML += '<div class="standard-content">' + completionVal + '</div>';
+                        }
+                        rowHTML += '</td>';
+
+                        // 列6: 标准分(权)
+                        rowHTML += '<td>' + scoreVal + '</td>';
+
+                        // 列7: 权重（=标准分）
+                        rowHTML += '<td>' + weightVal + '%</td>';
+
+                        // 列8: 自评分(30%) - 调整逻辑：数组元素不足时留空，多余时忽略
+                        const selfScoreVal = dataIdx < selfScoreData.length ? selfScoreData[dataIdx] : '';
+                        rowHTML += '<td data-row="' + dataIdx + '" data-field="selfScore">';
+                        if (selfScoreVal !== null && selfScoreVal !== undefined && selfScoreVal !== '') {
+                            rowHTML += selfScoreVal;
+                        }
+                        rowHTML += '</td>';
+
+                        // 列9: 上级领导评分(70%) - 调整逻辑：数组元素不足时留空，多余时忽略
+                        const scoreValData = dataIdx < scoreData.length ? scoreData[dataIdx] : '';
+                        rowHTML += '<td data-row="' + dataIdx + '" data-field="score">';
+                        if (scoreValData !== null && scoreValData !== undefined && scoreValData !== '') {
+                            rowHTML += scoreValData;
+                        }
+                        rowHTML += '</td>';
+
+                        if (window.showThirdScoreColumn) {
+                            // 列10: CEO评分 - 调整逻辑：数组元素不足时留空，多余时忽略
+                            const ceoVal = dataIdx < ceoData.length ? ceoData[dataIdx] : '';
+                            rowHTML += '<td data-row="' + dataIdx + '" data-field="ceo">';
+                            if (ceoVal !== null && ceoVal !== undefined && ceoVal !== '') {
+                                rowHTML += ceoVal;
+                            }
+                            rowHTML += '</td>';
+                        }
+
+                        // 列11: 考核评语 - 调整逻辑：数组元素不足时留空，多余时忽略
+                        const commentVal = dataIdx < commentData.length ? commentData[dataIdx] : '';
+                        rowHTML += '<td data-row="' + dataIdx + '" data-field="comment">';
+                        if (commentVal) {
+                            rowHTML += '<div class="standard-content">' + commentVal + '</div>';
+                        }
+                        rowHTML += '</td>';
+
+                        // 列12: 实际考核分值 - 调整逻辑：数组元素不足时留空，多余时忽略
+                        const actualScoreVal = dataIdx < actualScoreData.length ? actualScoreData[dataIdx] : '';
+                        rowHTML += '<td data-row="' + dataIdx + '" data-field="actualScore">';
+                        if (actualScoreVal !== null && actualScoreVal !== undefined && actualScoreVal !== '') {
+                            rowHTML += actualScoreVal;
+                        }
+                        rowHTML += '</td>';
+
+                        rowHTML += '</tr>';
+
+                        tbody.insertAdjacentHTML('beforeend', rowHTML);
+                        dataIdx++; stdIdx++; scoreIdx++;
+                    }
+                    tIdx++;
+                }
+            }
+
+            // 生成固定行的通用函数
+            const generateFixedRow = (seq, category, taskName, standard, score, dataKey, idx) => {
+                const completion = idx < completionData.length ? completionData[idx] : '';
+                const selfScore = idx < selfScoreData.length ? selfScoreData[idx] : '';
+                const scoreVal = idx < scoreData.length ? scoreData[idx] : '';
+                const ceoVal = idx < ceoData.length ? ceoData[idx] : '';
+                const comment = idx < commentData.length ? commentData[idx] : '';
+                const actualScore = idx < actualScoreData.length ? actualScoreData[idx] : '';
+
+                let rowHTML = `<tr>
+                    <td class="task-name">${seq}</td>
+                    <td class="task-name">${category}</td>
+                    <td class="task-name">${taskName}</td>
+                    <td class="standard-content">${standard}</td>
+                    <td data-row="${dataKey}" data-field="completion">`;
+
+                if (completion) rowHTML += `<div class="standard-content">${completion}</div>`;
+                rowHTML += `</td>
+                    <td>${score}</td>
+                    <td>${score}%</td>
+                    <td data-row="${dataKey}" data-field="selfScore">${selfScore !== null && selfScore !== undefined && selfScore !== '' ? selfScore : ''}</td>
+                    <td data-row="${dataKey}" data-field="score">${scoreVal !== null && scoreVal !== undefined && scoreVal !== '' ? scoreVal : ''}</td>`;
+
+                if (window.showThirdScoreColumn) {
+                    rowHTML += `<td data-row="${dataKey}" data-field="ceo">${ceoVal !== null && ceoVal !== undefined && ceoVal !== '' ? ceoVal : ''}</td>`;
+                }
+
+                rowHTML += `<td data-row="${dataKey}" data-field="comment">`;
+                if (comment) rowHTML += `<div class="standard-content">${comment}</div>`;
+                rowHTML += `</td>
+                    <td data-row="${dataKey}" data-field="actualScore">${actualScore !== null && actualScore !== undefined && actualScore !== '' ? actualScore : ''}</td>
+                </tr>`;
+
+                return rowHTML;
+            };
+
+            // 自动添加: 个人提升（15分）
+            const personalStandard = `①按项目和机构要求参与督导培训，注重学以致用和学习产出。
+②积极参与项目或机构组织的共学，有意识的投入学习与提升。
+③针对工作中存在的不足，能够接纳意见建议，积极学习和改进，并能够在第二次同类工作中呈现进步。
+④结合工作推进情况，每月进行月度工作总结与反思。`;
+            const personalRow = generateFixedRow(catSeq + 1, '个人提升(15分)', '个人工作能力学习与提升', personalStandard, 15, 'personalself', dataIdx);
+            tbody.insertAdjacentHTML('beforeend', personalRow);
+            dataIdx++;
+
+            // 自动添加: 加分项（10分）
+            const bonusStandard = `加分项累计最高不超过10分：\n①有效链接外部资源用于机构服务开展，当月链接各类资源折合3000元以下加1分；当月链接各类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。\n②协助机构总部事务，如招投标、年会活动筹备等且表现良好（主动承担，不计较不抱怨）；得2分。\n③所开展服务得到服务对象或购买方、合作伙伴好评或正式嘉许（提供表彰证书、锦旗、感谢信）；得2分。\n④有效提炼服务案例或撰写专业文章，并得到相关媒体平台发表；得5分。项目在第三方评估中获得优秀成绩；得5分。\n⑤个人获奖：个人获得行业协会、政府部门的奖励，包括优秀案例、优秀社工等；均可以得2分。\n⑥所在团队获奖：所在团队通过团队成员共同努力，获得行业协会、政府部门的奖励；均可以得2分。\n⑦其他对项目及机构发展的特别贡献：请具体说明；均可以得2分。`;
+            const bonusRow = generateFixedRow(catSeq + 2, '加分项(10分)', '特别贡献', bonusStandard, 10, 'bonusItem', dataIdx);
+            tbody.insertAdjacentHTML('beforeend', bonusRow);
+            dataIdx++;
+
+            // 计算总分
+            const totalSelf = selfScoreData.reduce((sum, val) => sum + parseFloat(val || 0), 0).toFixed(1);
+            const totalScore = scoreData.reduce((sum, val) => sum + parseFloat(val || 0), 0).toFixed(1);
+            const totalCeo = ceoData.reduce((sum, val) => sum + parseFloat(val || 0), 0).toFixed(1);
+            const totalActual = actualScoreData.reduce((sum, val) => sum + parseFloat(val || 0), 0).toFixed(1);
+
+            // 月度考核总分行 (12列)
+            let totalRowHTML = '<tr style="height: 40px; background-color:#c4c3c3; font-weight: bold;">' +
+                '<td colspan="5">月度考核总分</td>' +
+                '<td>110</td><td>110%</td>' +
+                '<td id="totalselfScore">' + totalSelf + '</td>' +
+                '<td id="totalscore">' + totalScore + '</td>';
+
+            if (window.showThirdScoreColumn) {
+                totalRowHTML += '<td id="totalceo">' + totalCeo + '</td>';
+            }
+
+            totalRowHTML += '<td></td>' +
+                '<td id="totalactualScore">' + totalActual + '</td>' +
+                '</tr>';
+
+            tbody.insertAdjacentHTML('beforeend', totalRowHTML);
+        </script>
+    </div>
+</body>
+
+</html>

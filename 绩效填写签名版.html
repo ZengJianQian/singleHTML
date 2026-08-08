@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>月度工作考核表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: #f5f5f5;
+            padding: 5px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 所有手机端横屏状态下隐藏标题、副标题等 */
+        @media (max-width: 1024px) and (orientation: landscape) and (hover: none) {
+
+            .header h1,
+            .header-info,
+            .notes-toggle-btn {
+                display: none !important;
+            }
+
+            .container {
+                padding: 5px;
+            }
+
+            .table-wrapper {
+                max-height: calc(100vh - 40px) !important;
+            }
+
+            .submit-btn {
+                position: fixed !important;
+                bottom: 4px !important;
+                transform: translateX(-50%) !important;
+            }
+
+            /* 表头优化 - 缩小字号、间距和内边距 */
+            th {
+                font-size: 8px !important;
+                padding: 1px 2px !important;
+                letter-spacing: 0 !important;
+                line-height: 1.2 !important;
+            }
+
+            td {
+                font-size: 8px !important;
+                padding: 1px 2px !important;
+                line-height: 1.2 !important;
+            }
+
+            .col-task,
+            .col-standard,
+            .col-status,
+            .col-score,
+            .col-self {
+                padding: 1px 2px !important;
+            }
+
+            /* 缩小按钮尺寸 */
+            button,
+            .submit-btn,
+            .signature-buttons button {
+                font-size: 8px !important;
+                padding: 4px 10px !important;
+                min-height: auto !important;
+            }
+
+            /* 调整输入框样式 */
+            input,
+            textarea,
+            select {
+                font-size: 8px !important;
+                padding: 1px 3px !important;
+                line-height: 1.2 !important;
+            }
+
+            /* 手写签名模块适配横屏 */
+            #signatureModal {
+                padding: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .signature-modal-content {
+                width: calc(100vw - 20px) !important;
+                height: calc(100vh - 30px) !important;
+                padding: 5px !important;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #signatureCanvas {
+                width: 100% !important;
+                height: 100% !important;
+                flex: 1;
+            }
+        }
+
+        /* H5移动端优化 */
+        @media (max-width: 1024px) and (hover: none) {
+            body {
+                padding: 2px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 6px;
+            }
+
+            .header h1 {
+                font-size: 14px !important;
+                letter-spacing: 1px;
+            }
+
+            .header-info {
+                font-size: 10px !important;
+                margin: 0px 0 !important;
+            }
+
+            .header-info .year-month,
+            .header-info #headerTitle {
+                font-size: 11px !important;
+            }
+
+            .header-info .org {
+                font-size: 10px !important;
+            }
+
+            .notes-toggle-btn {
+                font-size: 10px !important;
+                padding: 4px 8px !important;
+            }
+
+            /* 相关说明弹窗文字缩小 */
+            .notes-section h3 {
+                font-size: 12px;
+            }
+
+            .notes-section h4 {
+                font-size: 11px;
+            }
+
+            .notes-section p,
+            .notes-section li {
+                font-size: 10px;
+                line-height: 1.5;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 4px 2px !important;
+            }
+
+            /* 表头和特定列字号缩小 */
+            thead th,
+            td.standard-content {
+                font-size: 10px;
+                line-height: 1.2;
+            }
+
+            /* 手机端缩小类别行高度 */
+            .category-row td {
+                padding: 4px 2px;
+                font-size: 10px !important;
+            }
+
+            /* 完成情况和考核评语列文本进一步缩小 */
+            td:has(.status-input) .status-input,
+            td:has([data-field="comment"]) textarea,
+            td:has([name*="comment"]) textarea {
+                font-size: 9px;
+            }
+
+            .col-task {
+                width: 60px;
+            }
+
+            .col-standard {
+                width: 120px;
+            }
+
+            .col-status {
+                width: 100px;
+            }
+
+            .col-score {
+                width: 40px;
+            }
+
+            .col-self {
+                width: 45px;
+            }
+
+            .status-input,
+            .score-input {
+                font-size: 11px;
+                padding: 3px;
+            }
+
+            .standard-content {
+                font-size: 10px;
+                padding-left: 4px;
+            }
+
+            .notes-section {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-height: 85vh;
+                padding: 12px;
+            }
+
+            .notes-section h3 {
+                font-size: 13px;
+            }
+
+            .notes-section h4 {
+                font-size: 12px;
+            }
+
+            .notes-section p,
+            .notes-section li {
+                font-size: 11px;
+                line-height: 1.6;
+            }
+
+            .submit-btn {
+                width: 100%;
+                padding: 5px 20px !important;
+                font-size: 14px !important;
+            }
+
+            #signatureModal {
+                padding: 10px;
+            }
+
+            .signature-modal-content {
+                padding: 12px !important;
+            }
+
+            #signatureCanvas {
+                height: 200px !important;
+            }
+
+            .signature-buttons button {
+                padding: 8px 20px !important;
+                font-size: 14px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1px;
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 4px;
+            }
+
+            .header h1 {
+                font-size: 12px !important
+            }
+
+            .header-info .year-month,
+            .header-info #headerTitle {
+                font-size: 10px !important;
+            }
+
+            .header-info .org,
+            .notes-toggle-btn {
+                font-size: 9px !important;
+            }
+
+            /* 相关说明弹窗文字进一步缩小 */
+            .notes-section h3 {
+                font-size: 11px;
+            }
+
+            .notes-section h4 {
+                font-size: 10px;
+            }
+
+            .notes-section p,
+            .notes-section li {
+                font-size: 9px;
+                line-height: 1.4;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 3px 1px !important;
+            }
+
+            /* 进一步缩小特定列字号 */
+            thead th,
+            td.standard-content {
+                font-size: 9px;
+                line-height: 1.1;
+            }
+
+            /* 小屏手机进一步缩小类别行高度 */
+            .category-row td {
+                padding: 3px 1px !important;
+                font-size: 9px !important;
+            }
+
+            /* 完成情况和考核评语列文本进一步缩小 */
+            td:has(.status-input) .status-input,
+            td:has([data-field="comment"]) textarea,
+            td:has([name*="comment"]) textarea {
+                font-size: 8px;
+            }
+
+            .status-input,
+            .score-input {
+                font-size: 10px;
+                padding: 2px;
+            }
+
+            .standard-content {
+                font-size: 9px;
+            }
+
+            .notes-section p,
+            .notes-section li {
+                font-size: 10px;
+            }
+        }
+
+
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            margin-top: 0;
+            letter-spacing: 2px;
+        }
+
+        .header-info {
+            text-align: center;
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .header-info .year-month {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .header-info .org {
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .col-task {
+            width: 78px;
+        }
+
+        .col-standard {
+            width: 220px;
+        }
+
+        .col-status {
+            width: 200px;
+        }
+
+        .col-score {
+            width: 45px;
+        }
+
+        .col-self {
+            width: 50px;
+        }
+
+        /* 表头固定 */
+        .table-wrapper {
+            max-height: calc(100vh - 155px);
+            /* 调整表格高度为600px，可根据需要修改数值 */
+            overflow: auto;
+            position: relative;
+        }
+
+        /* 手机端增加表格高度，利用底部空间 */
+        @media (max-width: 1024px) and (hover: none) {
+            .table-wrapper {
+                max-height: calc(100vh - 110px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-wrapper {
+                max-height: calc(100vh - 100px);
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            .table-wrapper {
+                max-height: calc(100vh - 100px);
+            }
+        }
+
+        /* 移动端触摸优化 */
+        .status-input,
+        .score-input {
+            -webkit-user-modify: read-write-plaintext-only;
+            user-select: text;
+        }
+
+        /* 修复iOS上的输入框焦点问题 */
+        input,
+        textarea {
+            border-radius: 0;
+        }
+
+        /* 优化移动端滚动体验 */
+        .table-wrapper {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        /* 移动端按钮点击反馈 */
+        button {
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
+        }
+
+        /* 签名弹窗显示时禁止页面滚动和交互 */
+        body.signature-modal-open {
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* 签名弹窗基础样式 */
+        #signatureModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        thead th {
+            background: #b2e7b4;
+            color: #000000;
+            position: sticky;
+            top: 0;
+        }
+
+        .category-row {
+            background: #b0deee;
+            font-weight: bold;
+        }
+
+        .category-row td {
+            text-align: center;
+            padding-left: 0;
+            padding: 6px 4px;
+            font-size: 12px;
+        }
+
+        .task-name {
+            text-align: center;
+            padding-left: 0;
+            font-weight: 500;
+        }
+
+        .standard-content {
+            text-align: left;
+            padding-left: 8px;
+            font-size: 11px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        /* 完成情况输入框 - 填满单元格，自适应高度 */
+        .status-input {
+            width: 100%;
+            min-height: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-size: 12px;
+            padding: 4px;
+            resize: none;
+            overflow: hidden;
+            font-family: inherit;
+            line-height: 1.5;
+            display: block;
+            box-sizing: border-box;
+            field-sizing: content;
+        }
+
+        .status-input:focus {
+            outline: none;
+            background: #fffde7;
+        }
+
+        /* 自评分输入框 - 数字输入，填满单元格，居中 */
+        .score-input {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 12px;
+            padding: 0;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        /* 移除数字输入框的上下箭头 */
+        .score-input::-webkit-outer-spin-button,
+        .score-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .score-input:focus {
+            outline: none;
+            background: #fffde7;
+        }
+
+        /* 确保单元格有足够空间，高度由内容决定 */
+        td:has(.status-input),
+        td:has(.score-input) {
+            padding: 0;
+            height: 1px;
+        }
+
+        .notes-toggle-btn {
+            padding: 0;
+            background: none;
+            color: #333;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .notes-toggle-btn:hover {
+            color: #667eea;
+        }
+
+        .notes-toggle-btn .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            font-size: 10px;
+            color: #667eea;
+        }
+
+        .notes-toggle-btn.active .arrow {
+            transform: rotate(180deg);
+        }
+
+        .notes-section {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 15px;
+            background: #fafafa;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+        }
+
+        .notes-section.expanded {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notes-section h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #d32f2f;
+        }
+
+        .notes-section h4 {
+            font-size: 13px;
+            margin: 10px 0 5px 0;
+            color: #333;
+        }
+
+        .notes-section p,
+        .notes-section li {
+            font-size: 11px;
+            line-height: 1.8;
+            margin: 3px 0;
+        }
+
+        .notes-section ol,
+        .notes-section ul {
+            margin-left: 20px;
+        }
+
+        .highlight {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 15px;
+            }
+
+            input {
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>广州市阳光天使社会工作服务中心</h1>
+            <div class="header-info">
+                <span id="headerTitle" style="font-size: 16px;"></span>
+            </div>
+            <div class="header-info" style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="org" id="checkerInfo"></span>
+                <span class="org" id="nameInfo"></span>
+                <button type="button" class="notes-toggle-btn" id="notesToggleBtn">
+                    <span>相关说明</span>
+                    <span class="arrow">▼</span>
+                </button>
+            </div>
+        </div>
+        <div class="notes-section" id="notesSection">
+            <h4>项目填写</h4>
+            <ol>
+                <li>指标量是指项目点按年度指标分解成月度指标，再由月度指标量分解到每人的指标量，本月内必须要完成的工作量；本职职能考核是（本岗）每月必须完成的基础类工作。</li>
+                <li>"完成情况"是指各项工作任务完成的结果，被考核员工须自行填写具体、详细的工作完成情况，如当月完成xx活动xx场次，完成个案记录x份……不能简单填写"已完成"。</li>
+                <li>"标准分"是指每项工作任务根据其重要性赋予的分值，标准分总和为100分；各任务类别中的各项工作任务标准分之和不能超过规定分值。</li>
+            </ol>
+            <h4>评分说明</h4>
+            <p>评分结果：得分在98分及以上：达成目标并有所超越； 90≤得分&lt;98分（不含98分）：基本达成目标； 80≤得分&lt;90分：基本达成目标，但有所不足；70≤得分&lt;80分：离目标存在明显差距；
+                得分在70分以下：没有完成岗位职责，为不及格。连续3个月考核分为不及格，视为不能胜任该工作岗位，机构会采取相关措施，包括：进行针对性培训、要求整改、调整岗位、降低薪酬、提出辞退警告等。</p>
+            <p>评分结果: 系数 <span class="highlight">1.2（98～110分）</span> <span class="highlight">1（ 90≤得分&lt;98分）</span>
+                <span class="highlight">0.8（80≤得分&lt;90分）</span> <span class="highlight">0.5（70≤得分&lt;80分）</span> <span
+                    class="highlight">0（70分以下）</span>，评分结果对应的系数*该员工的月度绩效工资金额，所得金额为该员工当月实际所得的绩效工资。例如，张小明的工资构成为：基本工资+岗位工资+绩效工资=5000元，其中绩效工资为1000元，张小明在8月份的考核成绩为93分，其绩效工资则为1000元x1=1000元，无变动。若张小明的考核成绩为99分，则绩效工资为1000元x1.2=1000元，奖励200元。若张小明的绩效成绩为82分，绩效工资则为1000x0.8=800元，扣罚200元。
+            </p>
+            <h4>要求</h4>
+            <ol>
+                <li>每月8日前，由各部门/项目点负责人安排项目员工填写完成实际情况、自评得分，项目点主任按需结合员工面谈填写"上级评分"后汇总项目点所有人员绩效总表，把电子版发给行政部；行政部收集完毕后统一发给首席执行官评核，其中项目点主任本人填写好自评分，由首席执行官填写"上级评分"。
+                </li>
+                <li>因自评人迟交评分表扣本人5分/天，超过三天扣20分。</li>
+                <li>因评分人迟交评分表扣评分人5分/天，超过三天扣20分。</li>
+            </ol>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead id="tableHead">
+                    <!-- 表头由JavaScript动态生成 -->
+                </thead>
+                <tbody id="tableBody">
+                    <!-- 表格内容由JavaScript动态生成 -->
+                </tbody>
+
+            </table>
+        </div>
+        <!-- 签名模态框 -->
+        <div id="signatureModal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+            <div class="signature-modal-content"
+                style="background: #fff; border-radius: 5px; padding: 5px; max-width: 95%; width: 100%; max-height: 90vh; overflow-y: auto;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; display: flex !important; visibility: visible !important; opacity: 1 !important;">
+                    <h3
+                        style="text-align: center; margin: 0; color: #333; flex: 1; display: block !important; visibility: visible !important; opacity: 1 !important;">
+                        手写签名</h3>
+                    <button type="button" class="signature-close-btn"
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0 10px; display: block !important; visibility: visible !important; opacity: 1 !important;">
+                        ×
+                    </button>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                    <div class="signature-canvas-wrapper"
+                        style="border: 1px solid #ddd; border-radius: 4px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%;">
+                        <canvas id="signatureCanvas" style="width: 100%; height: 250px; cursor: crosshair;"></canvas>
+                    </div>
+                    <div class="signature-buttons"
+                        style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                        <button type="button" id="clearSignatureBtn"
+                            style="padding: 5px 10px; background: #f44336; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background 0.3s ease; flex: 1; min-width: 120px;">
+                            清除
+                        </button>
+                        <button type="button" id="saveSignatureBtn"
+                            style="padding: 5px 10px; background: #4CAF50; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background 0.3s ease; flex: 1; min-width: 120px;">
+                            保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="submit-section" style="margin-top: 5px; text-align: center;">
+            <button type="button" class="submit-btn" id="submitBtn"
+                style="padding: 8px 12px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(17, 153, 142, 0.3); transition: all 0.3s ease;">
+                提交考核表
+            </button>
+        </div>
+        <script>
+            const form = {
+                    "leader": "周雪桃",
+                    "leaderid": "b96gc577",
+                    "name": "陈淑贞",
+                    "userid": "g5gaed63",
+                    "任务分段": "3|1|1",
+                    "任务类别": "工作内容考核(60分)|岗位规范（10分）|团队带领（15分）",
+                    "岗位": "片长",
+                    "工作任务与内容": "KPI完成情况|部长管理工作|工作产出质量|工作规范|团队带领与管理",
+                    "标准分": "20|20|20|10|15",
+                    "模版名称": "社工站项目",
+                    "签名处文本": "上级领导签名：",
+                    "考核标准1": "当月各项服务KPI完成情况（电访、探访、个案、小组、活动、公共事务响应任务等）：由项目主任安排的当月须完成的各项服务指标，均须当月完成。每有一项拖延扣5分。\n特殊情况造成无法完成的（如天气影响、购买方要求变更等），有效解释后经项目主任同意可做调整。须在考核表中详细说明情况。",
+                    "考核标准2": "清晰个人岗位职责，高效统筹片区（站点）工作，把控各项工作产出和质量。\n①有效监管团队员工按时按质完成恒常工作指标。根据合同的年度服务指标量总量，分解到每月应该完成的固定指标量，要求100%完成月度指标量，完成80%-99%，此项扣10分，完成79%以下，此项0分。\n②有效监管团队员工按时完成当月服务文书、相关工作记录、报告等。领域团队中出现2人以上无故拖延文书的，部长此项扣10分。\n③相关工作及时回应、及时交代，包括正式会议、口头传达的工作、邮件往来等。\n④若有团队成员当月绩效考评成绩低于70分，部长在该项考核得分按每位成员直接扣减5分，如此类推。",
+                    "考核标准3": "①以优质质量完成服务KPI和文书工作（内容涵盖本月完成的各项文书记录，有计划书、总结、记录、新闻稿等），提交主任/副主任或督导来回沟通修改（上级反馈的意见）少于3次。（新入职员工在前半年可以增加到5次）\n②对项目工作的推进和改善主动积极思考，提出建设性的意见。\n④在28日前提交下月的个人工作计划，提交到主任/副主任处。",
+                    "考核标准4": "①清晰个人岗位职责；遵守社会工作专业价值和伦理操守。\n②认同并熟悉机构的MVV，遵守机构及项目规章制度、员工守则，严格遵守考勤要求。\n③个人有特殊情况及时沟通，不对项目产生不良影响。\n④积极配合项目服务发展需要、配合上级工作安排并完成相应工作。\n⑤以身作则，以积极向上的工作态度，引领团队对项目和机构有充分、正面的认识，有强的归属感。",
+                    "考核标准5": "①能够以积极正面的态度向团队员工传达工作任务、传递项目服务意义，带领团队员工，有序推进各项工作。\n②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。\n③针对员工出现的困难和问题，能够通过面谈沟通等方式，有效处理。\n④特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n⑤协同主任团队，完成与项目每一位员工的每月会谈，并为项目员工提供成长指引，完成会谈记录。",
+                    "表格类型": "片长/部长/站长/组长",
+                    "评分人文本": "自评分（30%）|上级领导评分（70%）",
+                    "项目名称": "石楼社工站"
+                }
+            const dataRaw = {};
+            const month = "2026年7月"
+            const userid = "g5gaed63"
+            const record = ""
+            const checker = "陈淑贞"
+            const signature = false
+            const name = form["name"];
+            const formtype = form["表格类型"]
+            document.getElementById('headerTitle').textContent = month + '（' + form["项目名称"] + '项目）' + formtype + '月度工作考核表';
+            document.getElementById('checkerInfo').textContent = '填写人：' + checker;
+            document.getElementById('nameInfo').textContent = '考核人：' + name;
+            const data = parseAllArrayFields(dataRaw);
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // 统一从 URL 读取小写参数名，覆盖 data 中的对应字段
+            ['completion', 'selfScore', 'comment', 'score', 'ceo'].forEach(key => {
+                if (urlParams.has(key)) {
+                    const parsed = parseJSONArray(urlParams.get(key));
+                    if (parsed !== urlParams.get(key)) data[key] = parsed;
+                }
+            });
+            // 判断是否自评模式（checker和name一样时为自评）
+            const isSelfAssessment = (checker === name);
+            window.isSelfAssessment = isSelfAssessment;
+
+            // 全局行计数器
+            let globalRowIndex = 0;
+
+            // 动态生成整个表格内容
+            (function generateTable() {
+                const tbody = document.getElementById('tableBody');
+                const thead = document.getElementById('tableHead');
+                if (!tbody || !thead) return;
+
+                // 清空tbody和thead内容
+                tbody.innerHTML = '';
+                thead.innerHTML = '';
+
+                // 获取数据
+                const taskCategories = form["任务类别"] || "";
+                const taskNames = form["工作任务与内容"] || "";
+                const taskSegments = form["任务分段"] || "";
+                const standards = form["标准分"] || "";
+                let scoreTexts = form["评分人文本"] || "自评分（30%）";
+                if (isSelfAssessment) scoreTexts = scoreTexts.split('|')[0];
+                // 处理评分人文本，生成评分列标题
+                const scoreColumns = scoreTexts.split('|').map(s => s.trim()).filter(s => s);
+                window.scoreColumns = scoreColumns;
+
+                // 生成表头
+                const headerRow = document.createElement('tr');
+                let headerHTML = `
+                    <th class="col-task">工作任务与内容</th>
+                    <th class="col-standard">考核标准</th>
+                    <th class="col-status">完成情况</th>
+                `;
+
+                // 非自评时添加考核评语列
+                if (!isSelfAssessment) {
+                    headerHTML += `<th class="col-status">考核评语</th>`;
+                }
+
+                headerHTML += `<th class="col-score">标准分</th>`;
+
+                // 根据评分人文本添加评分列
+                scoreColumns.forEach((colText, idx) => {
+                    // 当userid等于leaderid或checker等于leader时，隐藏第三列
+                    const shouldHideColumn = (userid === form["leaderid"] || checker === form["leader"]) && idx === 2;
+                    if (!shouldHideColumn) {
+                        headerHTML += `<th class="col-self">${colText}</th>`;
+                    }
+                });
+                headerRow.innerHTML = headerHTML;
+                thead.appendChild(headerRow);
+
+                // 计算总列数
+                let visibleScoreColumns = scoreColumns.length;
+                // 当userid等于leaderid或checker等于leader时，减少一列（隐藏第三列）
+                if ((userid === form["leaderid"] || checker === form["leader"]) && scoreColumns.length > 2) {
+                    visibleScoreColumns--;
+                }
+                let totalCols = 4 + visibleScoreColumns;
+                if (!isSelfAssessment) {
+                    totalCols++; // 加上考核评语列
+                }
+
+                // 分割数据
+                const categories = taskCategories.split('|').map(s => s.trim()).filter(s => s);
+                categories.push("个人提升(15分)", "加分项(10分)");
+                const tasks = taskNames.split('|').map(s => s.trim()).filter(s => s);
+                tasks.push("个人工作能力学习与提升", "特别贡献");
+
+                const segments = taskSegments.split('|').map(s => parseInt(s.trim()) || 1);
+                window.segments = segments;
+                const scoreList = standards.split('|').map(s => s.trim()).filter(s => s);
+                // 提取考核标准并按数字排序
+                const standardKeys = Object.keys(form)
+                    .filter(key => key.startsWith("考核标准"))
+                    .sort((a, b) => {
+                        const numA = parseInt(a.replace("考核标准", "")) || 0;
+                        const numB = parseInt(b.replace("考核标准", "")) || 0;
+                        return numA - numB;
+                    });
+                let standardContents = standardKeys.map(key => form[key]);
+
+                // 添加固定考核标准
+                const fixedStandard1 = "①按项目和机构要求参与督导培训，注重学以致用和学习产出。<br>②积极参与项目或机构组织的共学，有意识的投入学习与提升。<br>③针对工作中存在的不足，能够接纳意见建议，积极学习和改进，并能够在第二次同类工作中呈现进步。<br>④结合工作推进情况，每月进行月度工作总结与反思。";
+                const fixedStandard2 = "加分项累计最高不超过10分：<br>①有效链接外部资源用于机构服务开展，当月链接各类资源折合3000元以下加1分；当月链接各类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。<br>②协助机构总部事务，如招投标、年会活动筹备等且表现良好（主动承担，不计较不抱怨）；得2分。<br>③所开展服务得到服务对象或购买方、合作伙伴好评或正式嘉许（提供表彰证书、锦旗、感谢信）；得2分。<br>④有效提炼服务案例或撰写专业文章，并得到相关媒体平台发表；得5分。项目在第三方评估中获得优秀成绩；得5分。<br>⑤个人获奖：个人获得行业协会、政府部门的奖励，包括优秀案例、优秀社工等；均可以得2分。<br>⑥所在团队获奖：所在团队通过团队成员共同努力，获得行业协会、政府部门的奖励；均可以得2分。<br>⑦其他对项目及机构发展的特别贡献：请具体说明；均可以得2分。";
+                standardContents.push(fixedStandard1, fixedStandard2);
+
+                let taskIndex = 0;
+                let scoreIndex = 0;
+                let standardIndex = 0;
+                // 检查是否有KPI细项，并解析考核标准1是否为数组
+                const hasKPIDetails = form["KPI细项"] && form["KPI细项"].trim() !== "";
+                let kpiStandardArray = null;
+                let kpiTitlesArray = null;
+                let firstTaskRowspan = 1;
+                if (hasKPIDetails && standardContents.length > 0) {
+                    kpiStandardArray = standardContents[0].split('|').map(s => s.trim()).filter(s => s);
+                    if (Array.isArray(kpiStandardArray)) {
+                        kpiTitlesArray = form["KPI细项"].split('|').map(s => s.trim()).filter(s => s);
+                    }
+                } else {
+                    const expectedRows = scoreList.length;
+                    const segmentsSum = segments.reduce((sum, s) => sum + s, 0);
+                    const extraRows = expectedRows - segmentsSum;
+                    if (extraRows > 0) {
+                        firstTaskRowspan = extraRows + 1;
+                    }
+                }
+                // 获取默认分数
+                function getDefaultScore(taskName) {
+                    if (taskName.includes('个人工作能力学习与提升')) return '15';
+                    if (taskName.includes('特别贡献')) return '10';
+                    return '';
+                }
+
+                // 生成评分列HTML
+                function generateScoreColumnsHTML(score, rowIndex) {
+                    let html = '';
+                    scoreColumns.forEach((colText, idx) => {
+                        // 当userid等于leaderid或checker等于leader时，跳过第三列
+                        const shouldHideColumn = (userid === form["leaderid"] || checker === form["leader"]) && idx === 2;
+                        if (shouldHideColumn) return;
+
+                        const isSelfScore = (idx === 0);
+                        const isReadonly = (!isSelfAssessment && isSelfScore);
+                        const inputReadonly = isReadonly ? 'readonly' : '';
+                        const tabIndex = isReadonly ? '-1' : '';
+                        let inputValue = '';
+                        if (isSelfScore && data.selfScore && data.selfScore[rowIndex] !== null && data.selfScore[rowIndex] !== undefined) {
+                            inputValue = data.selfScore[rowIndex];
+                        } else if (!isSelfScore && data.score && data.score[rowIndex] !== null && data.score[rowIndex] !== undefined && idx === 1) {
+                            inputValue = data.score[rowIndex];
+                        } else if (!isSelfScore && data.ceo && data.ceo[rowIndex] !== null && data.ceo[rowIndex] !== undefined && idx === 2) {
+                            inputValue = data.ceo[rowIndex];
+                        }
+                        html += `<td><input type="number" class="score-input" min="0" max="${score}" ${inputReadonly} ${tabIndex ? `tabindex="${tabIndex}"` : ''} data-row="${rowIndex}" data-field="${colText}" value="${inputValue}" oninput="if(this.value < 0 || isNaN(this.value)) this.value = ''; if(this.value > parseFloat(this.parentElement.previousElementSibling.textContent)) this.value = parseFloat(this.parentElement.previousElementSibling.textContent)"></td>`;
+                    });
+                    return html;
+                }
+
+                // 生成考核评语列HTML
+                function generateCommentColumnHTML(rowIndex) {
+                    if (isSelfAssessment) return '';
+                    const commentValue = (data.comment && data.comment[rowIndex]) || '';
+                    return `<td><textarea class="status-input" rows="1" data-row="${rowIndex}" data-field="comment" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">${commentValue}</textarea></td>`;
+                }
+
+                // 生成单行HTML
+                function generateRowHTML(options) {
+                    const {
+                        taskName,
+                        taskCellHTML = '',
+                        standardContent,
+                        statusId,
+                        score,
+                        rowIndex,
+                        commentColumn = '',
+                        scoreCols = '',
+                        completionValue = '',
+                        statusReadonly = ''
+                    } = options;
+
+                    const completion = completionValue || (data.completion && data.completion[rowIndex]) || '';
+                    const isReadonly = !!statusReadonly || !isSelfAssessment;
+                    const readonly = isReadonly ? 'readonly' : '';
+                    const tabIndex = isReadonly ? '-1' : '';
+                    const comment = commentColumn || generateCommentColumnHTML(rowIndex);
+                    const scores = scoreCols || generateScoreColumnsHTML(score, rowIndex);
+
+                    return `
+                        ${taskCellHTML}
+                        <td class="standard-content">${standardContent}</td>
+                        <td><textarea id="${statusId}" class="status-input" rows="1" data-row="${rowIndex}" data-field="completion" ${readonly} ${tabIndex ? `tabindex="${tabIndex}"` : ''} oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">${completion}</textarea></td>
+                        ${comment}
+                        <td>${score}</td>
+                        ${scores}
+                    `;
+                }
+
+                // 创建并添加行
+                function createAndAppendRow(html) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = html;
+                    tbody.appendChild(row);
+                    globalRowIndex++;
+                }
+
+                // 生成任务行
+                function generateTaskRow(options) {
+                    const { taskName, standardContent, score, rowIndex, taskCellHTML = '' } = options;
+                    const statusId = `status-${rowIndex + 1}`;
+                    const finalTaskCellHTML = taskCellHTML || `<td class="task-name">${taskName}</td>`;
+                    const html = generateRowHTML({
+                        taskName,
+                        taskCellHTML: finalTaskCellHTML,
+                        standardContent,
+                        statusId,
+                        score,
+                        rowIndex
+                    });
+                    createAndAppendRow(html);
+                }
+
+                // 为每个类别生成行
+                categories.forEach((category, catIndex) => {
+                    const categoryRow = document.createElement('tr');
+                    categoryRow.className = 'category-row';
+                    categoryRow.innerHTML = `<td colspan="${totalCols}">${category}</td>`;
+                    tbody.appendChild(categoryRow);
+
+                    const segmentCount = segments[catIndex] || 1;
+
+                    // 特殊处理：如果是第一个类别且有KPI细项数组
+                    if (catIndex === 0 && kpiStandardArray && kpiStandardArray.length > 0) {
+                        const kpiTaskName = tasks[taskIndex];
+                        const kpiRowCount = kpiStandardArray.length;
+
+                        kpiStandardArray.forEach((standardItem, itemIndex) => {
+                            let score = scoreList[scoreIndex + itemIndex] || getDefaultScore(kpiTaskName);
+                            const statusId = `status-kpi-${itemIndex + 1}`;
+                            const taskCellHTML = itemIndex === 0 ?
+                                `<td class="task-name" rowspan="${kpiRowCount}">${kpiTaskName}</td>` : '';
+                            const kpiTitle = kpiTitlesArray && kpiTitlesArray[itemIndex] ? kpiTitlesArray[itemIndex] : '';
+                            const standardContentHTML = kpiTitle ?
+                                `<strong>${kpiTitle}</strong><br>${standardItem}` : standardItem;
+
+                            const html = generateRowHTML({
+                                taskName: kpiTaskName,
+                                taskCellHTML,
+                                standardContent: standardContentHTML,
+                                statusId,
+                                score,
+                                rowIndex: globalRowIndex
+                            });
+                            createAndAppendRow(html);
+                        });
+
+                        taskIndex++;
+                        scoreIndex += kpiRowCount;
+                        standardIndex++;
+
+                        for (let i = 1; i < segmentCount; i++) {
+                            if (taskIndex >= tasks.length) break;
+                            const taskName = tasks[taskIndex];
+                            const score = scoreList[scoreIndex] || getDefaultScore(taskName);
+                            const standardContent = standardContents[standardIndex] || '';
+
+                            generateTaskRow({
+                                taskName,
+                                standardContent,
+                                score,
+                                rowIndex: globalRowIndex
+                            });
+
+                            taskIndex++;
+                            scoreIndex++;
+                            standardIndex++;
+                        }
+                    } else {
+                        // 处理第一个类别且有首任务合并的情况
+                        if (catIndex === 0 && firstTaskRowspan > 1) {
+                            // 首个任务：纵向合并 firstTaskRowspan 行
+                            const firstTaskName = tasks[taskIndex];
+                            // 第一行：带有 rowspan 的任务名
+                            const firstScore = scoreList[scoreIndex] || getDefaultScore(firstTaskName);
+                            const firstStandardContent = standardContents[standardIndex] || '';
+                            const firstStatusId = `status-${globalRowIndex + 1}`;
+                            const firstTaskCellHTML = `<td class="task-name" rowspan="${firstTaskRowspan}">${firstTaskName}</td>`;
+                            const firstRowHTML = generateRowHTML({
+                                taskName: firstTaskName,
+                                taskCellHTML: firstTaskCellHTML,
+                                standardContent: firstStandardContent,
+                                statusId: firstStatusId,
+                                score: firstScore,
+                                rowIndex: globalRowIndex
+                            });
+                            createAndAppendRow(firstRowHTML);
+                            scoreIndex++;
+                            standardIndex++;
+
+                            // 生成剩余的合并行（同一任务名，无独立任务列）
+                            for (let m = 1; m < firstTaskRowspan; m++) {
+                                const mergeScore = scoreList[scoreIndex] || getDefaultScore(firstTaskName);
+                                const mergeStandardContent = standardContents[standardIndex] || '';
+                                const mergeStatusId = `status-${globalRowIndex + 1}`;
+                                const mergeRowHTML = generateRowHTML({
+                                    taskName: firstTaskName,
+                                    taskCellHTML: '',
+                                    standardContent: mergeStandardContent,
+                                    statusId: mergeStatusId,
+                                    score: mergeScore,
+                                    rowIndex: globalRowIndex
+                                });
+                                createAndAppendRow(mergeRowHTML);
+                                scoreIndex++;
+                                standardIndex++;
+                            }
+                            taskIndex++;
+
+                            // 生成该类别剩余的普通任务行（去掉已用的 1 行）
+                            for (let i = 1; i < segmentCount; i++) {
+                                if (taskIndex >= tasks.length) break;
+                                const taskName = tasks[taskIndex];
+                                const score = scoreList[scoreIndex] || getDefaultScore(taskName);
+                                const standardContent = standardContents[standardIndex] || '';
+
+                                generateTaskRow({
+                                    taskName,
+                                    standardContent,
+                                    score,
+                                    rowIndex: globalRowIndex
+                                });
+
+                                taskIndex++;
+                                scoreIndex++;
+                                standardIndex++;
+                            }
+                        } else {
+                            for (let i = 0; i < segmentCount; i++) {
+                                if (taskIndex >= tasks.length) break;
+                                const taskName = tasks[taskIndex];
+                                const score = scoreList[scoreIndex] || getDefaultScore(taskName);
+                                const standardContent = standardContents[standardIndex] || '';
+
+                                generateTaskRow({
+                                    taskName,
+                                    standardContent,
+                                    score,
+                                    rowIndex: globalRowIndex
+                                });
+
+                                taskIndex++;
+                                scoreIndex++;
+                                standardIndex++;
+                            }
+                        }
+                    }
+                });
+            })();
+
+            (function () {
+                const toggleBtn = document.getElementById('notesToggleBtn');
+                const notesSection = document.getElementById('notesSection');
+                let isExpanded = false;
+
+                function toggleNotes(e) {
+                    e.stopPropagation();
+                    isExpanded = !isExpanded;
+                    if (isExpanded) {
+                        notesSection.classList.add('expanded');
+                        toggleBtn.classList.add('active');
+                    } else {
+                        notesSection.classList.remove('expanded');
+                        toggleBtn.classList.remove('active');
+                    }
+                }
+
+                function collapseNotes() {
+                    if (isExpanded) {
+                        isExpanded = false;
+                        notesSection.classList.remove('expanded');
+                        toggleBtn.classList.remove('active');
+                    }
+                }
+
+                toggleBtn.addEventListener('click', toggleNotes);
+
+                notesSection.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!toggleBtn.contains(e.target) && !notesSection.contains(e.target)) {
+                        collapseNotes();
+                    }
+                });
+
+                // ESC键关闭弹窗
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        collapseNotes();
+                    }
+                });
+            })();
+
+            // 表单提交功能
+            (function () {
+                const submitBtn = document.getElementById('submitBtn');
+                // 提交URL - 挂载到window全局对象，供签名功能调用
+                window.submitURL = 'https://open.feishu.cn/anycross/trigger/callback/MDRkMjEzODNjOTQ0ZjJlMWUzNTIzZDQwY2I3NDQ0M2Ey';
+
+                // 设置按钮状态 - 挂载到window全局对象，供签名功能调用
+                window.setButtonState = function (loading, originalText) {
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (!submitBtn) return;
+
+                    if (loading) {
+                        submitBtn.textContent = '正在提交';
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = '0.6';
+                        submitBtn.style.cursor = 'not-allowed';
+                    } else {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'pointer';
+                    }
+                }
+
+                // 处理提交响应 - 挂载到window全局对象，供签名功能调用
+                window.handleResponse = function (data, originalText) {
+                    if (data && data.includes('success')) {
+                        alert('提交成功！');
+                        window.close();
+                    } else {
+                        const errorMsg = (data && data.startsWith('error:')) ? data.substring(6) : null;
+                        alert('提交失败：' + (errorMsg || '请稍后重试'));
+                        window.setButtonState(false, originalText);
+                    }
+                }
+
+                submitBtn.addEventListener('click', function () {
+                    // ========== 提交前完整度校验 ==========
+                    const tbody = document.querySelector('table tbody');
+                    if (!tbody) {
+                        alert('无法读取表格内容，请重试。');
+                        return;
+                    }
+                    const rows = tbody.querySelectorAll('tr');
+                    let emptyCount = 0;
+                    const emptyByField = {};
+                    let rowNumber = 0;
+
+                    // 先判断是否需要隐藏CEO列（和提交逻辑保持一致）
+                    const shouldHideCEOColumn = (userid === form["leaderid"] || checker === form["leader"]);
+
+                    rows.forEach(function (row) {
+                        if (row.classList.contains('category-row') || row.classList.contains('total-row')) return;
+                        rowNumber++;
+
+                        const textareas = row.querySelectorAll('textarea');
+                        const inputs = row.querySelectorAll('input');
+
+                        // 按 data-field 检查 textarea（完成情况、考核评语）
+                        textareas.forEach(function (ta) {
+                            const field = ta.getAttribute('data-field') || '';
+                            const label = field === 'completion' ? '完成情况' : (field === 'comment' ? '考核评语' : field);
+                            if (!ta.value || !ta.value.trim()) {
+                                emptyCount++;
+                                if (!emptyByField[label]) emptyByField[label] = [];
+                                emptyByField[label].push(rowNumber);
+                            }
+                        });
+                        // 按 data-field 检查评分 input
+                        inputs.forEach(function (inp) {
+                            const fieldName = inp.getAttribute('data-field') || '';
+
+                            // 如果CEO列需要隐藏，则跳过检查CEO列
+                            if (shouldHideCEOColumn && fieldName.includes('CEO')) return;
+
+                            // 检查所有非CEO列或需要显示的CEO列
+                            if (!inp.value || isNaN(parseFloat(inp.value))) {
+                                emptyCount++;
+                                if (!emptyByField[fieldName]) emptyByField[fieldName] = [];
+                                emptyByField[fieldName].push(rowNumber);
+                            }
+                        });
+                    });
+                    if (emptyCount > 0) {
+                        const detailLines = Object.keys(emptyByField).map(function (label) {
+                            return label + '：' + emptyByField[label].join(',') + '行';
+                        });
+                        alert('还有 ' + emptyCount + ' 项未填写，请补全后再提交：\n' + detailLines.join('\n'));
+                        return;
+                    }
+
+                    if (signature) {
+                        // 显示签名模态框
+                        const modal = document.getElementById('signatureModal');
+                        const modalContent = modal.querySelector('.signature-modal-content');
+                        const tableWrapper = document.querySelector('.table-wrapper');
+                        const table = document.querySelector('table');
+
+                        // 禁止页面滚动和交互
+                        document.body.classList.add('signature-modal-open');
+                        modal.style.display = 'flex';
+                        // 获取表格或表格容器的宽度
+                        let targetWidth = '95%'; // 默认值
+                        if (table) {
+                            targetWidth = table.offsetWidth + 'px';
+                        } else if (tableWrapper) {
+                            targetWidth = tableWrapper.offsetWidth + 'px';
+                        }
+                        // 设置模态框内容宽度
+                        modalContent.style.maxWidth = targetWidth;
+                        modalContent.style.width = '100%';
+
+                        modal.style.display = 'flex';
+                        // 阻止默认提交，等待签名完成后再提交
+                        return false;
+                    } else {
+                        // 跳过签名，直接提交
+                        performFormSubmit();
+                        return false;
+                    }
+                });
+
+                window.collectFormData = function () {
+                    const data = {
+                        header: {},
+                        items: [],
+                        timestamp: new Date().toISOString()
+                    };
+
+                    const tbody = document.querySelector('table tbody');
+                    if (tbody) {
+                        const rows = tbody.querySelectorAll('tr');
+                        rows.forEach(function (row) {
+                            if (row.classList.contains('category-row') || row.classList.contains('total-row')) return;
+                            const textareas = row.querySelectorAll('textarea');
+                            const inputs = row.querySelectorAll('input');
+                            // 按 data-field 收集 textarea 的值（完成情况、考核评语）
+                            let completionValue = '';
+                            let commentValue = '';
+                            textareas.forEach(function (ta) {
+                                const field = ta.getAttribute('data-field');
+                                if (field === 'completion') completionValue = ta.value;
+                                else if (field === 'comment') commentValue = ta.value;
+                            });
+                            // 按 data-field 收集评分 input：第一个为自评分，其余为其他评分
+                            let selfScoreValue = '';
+                            const otherScores = [];
+                            inputs.forEach(function (inp) {
+                                const field = inp.getAttribute('data-field') || '';
+                                const isSelfScore = (window.scoreColumns && window.scoreColumns[0] && field === window.scoreColumns[0]);
+                                if (isSelfScore) {
+                                    selfScoreValue = inp.value;
+                                } else {
+                                    otherScores.push(inp.value);
+                                }
+                            });
+                            const item = {
+                                completion: completionValue,
+                                selfScore: selfScoreValue
+                            };
+                            if (!window.isSelfAssessment) {
+                                item.comment = commentValue;
+                                item.otherScores = otherScores;
+                            }
+                            data.items.push(item);
+                        });
+                    }
+                    return data;
+                }
+            })();
+            function parseJSONArray(str) {
+                if (typeof str !== 'string') return str;
+                const trimmed = str.trim();
+                if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return str;
+                try {
+                    const escaped = trimmed.replace(/"([^"]*?)"/g, function (match, content) {
+                        return '"' + content.replace(/\r?\n/g, '\\n') + '"';
+                    });
+                    return JSON.parse(escaped);
+                } catch (e) {
+                    return str;
+                }
+            }
+            function parseAllArrayFields(obj) {
+                const result = {};
+                Object.keys(obj).forEach(key => {
+                    result[key] = parseJSONArray(obj[key]);
+                });
+                return result;
+            }
+
+            // 签名功能实现
+            (function initSignature() {
+                const canvas = document.getElementById('signatureCanvas');
+                const ctx = canvas.getContext('2d');
+                const clearBtn = document.getElementById('clearSignatureBtn');
+                const saveBtn = document.getElementById('saveSignatureBtn');
+                const previewSection = document.getElementById('signaturePreview');
+                const previewImg = document.getElementById('signaturePreviewImg');
+
+                // 设置canvas实际尺寸（支持高DPI屏幕）
+                function setupCanvas() {
+                    const rect = canvas.getBoundingClientRect();
+                    // 确保canvas有正确的尺寸
+                    let width = Math.max(100, rect.width); // 最小宽度100px
+                    let height = Math.max(50, rect.height); // 最小高度50px
+
+                    canvas.width = width * window.devicePixelRatio;
+                    canvas.height = height * window.devicePixelRatio;
+
+                    // 重置变换矩阵
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+                    // 设置画笔样式
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                }
+
+                setupCanvas();
+                window.addEventListener('resize', setupCanvas);
+
+                let isDrawing = false;
+                let lastX = 0;
+                let lastY = 0;
+                let signaturePaths = []; // 存储签名路径点
+
+                // 开始绘制
+                function startDrawing(e) {
+                    isDrawing = true;
+                    [lastX, lastY] = getCanvasCoordinates(e);
+                    signaturePaths.push({ type: 'move', x: lastX, y: lastY });
+                }
+
+                // 结束绘制
+                function stopDrawing() {
+                    isDrawing = false;
+                }
+
+                // 获取canvas坐标
+                function getCanvasCoordinates(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    let x, y;
+
+                    // 获取原始触摸位置
+                    if (e.type.includes('touch')) {
+                        x = e.touches[0].clientX - rect.left;
+                        y = e.touches[0].clientY - rect.top;
+                    } else {
+                        x = e.offsetX || e.clientX - rect.left;
+                        y = e.offsetY || e.clientY - rect.top;
+                    }
+
+                    // 确保坐标在canvas范围内
+                    x = Math.max(0, Math.min(x, rect.width));
+                    y = Math.max(0, Math.min(y, rect.height));
+                    return [x, y];
+                }
+
+                // 绘制
+                function draw(e) {
+                    if (!isDrawing) return;
+
+                    const [x, y] = getCanvasCoordinates(e);
+
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    signaturePaths.push({ type: 'line', x, y });
+                    [lastX, lastY] = [x, y];
+                }
+
+                // 清除签名
+                function clearSignature() {
+                    ctx.clearRect(0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
+                    if (previewSection) {
+                        previewSection.style.display = 'none';
+                    }
+                    window.signatureBase64 = null;
+                    signaturePaths = []; // 清空路径记录
+                }
+
+                // 保存并裁剪签名，然后提交表单
+                function saveSignature() {
+                    // 检查canvas是否有效
+                    let sourceWidth = canvas.width / window.devicePixelRatio;
+                    let sourceHeight = canvas.height / window.devicePixelRatio;
+
+                    if (sourceWidth === 0 || sourceHeight === 0) {
+                        alert('签名区域无效，请重新打开签名窗口');
+                        return;
+                    }
+
+                    // 获取canvas像素数据（使用实际的canvas尺寸，考虑devicePixelRatio）
+                    const actualWidth = canvas.width;
+                    const actualHeight = canvas.height;
+                    const imageData = ctx.getImageData(0, 0, actualWidth, actualHeight);
+                    const data = imageData.data;
+                    // 寻找签名的边界
+                    let minX = actualWidth, maxX = 0;
+                    let minY = actualHeight, maxY = 0;
+                    let hasSignature = false;
+                    // 遍历像素数据，找到有签名的区域
+                    for (let y = 0; y < actualHeight; y++) {
+                        for (let x = 0; x < actualWidth; x++) {
+                            const index = (y * actualWidth + x) * 4;
+                            const alpha = data[index + 3];
+
+                            // 如果像素不是透明的（有签名）
+                            if (alpha > 0) {
+                                hasSignature = true;
+                                if (x < minX) minX = x;
+                                if (x > maxX) maxX = x;
+                                if (y < minY) minY = y;
+                                if (y > maxY) maxY = y;
+                            }
+                        }
+                    }
+                    // 如果没有签名
+                    if (!hasSignature) {
+                        alert('请先进行签名');
+                        return;
+                    }
+
+                    // 计算裁剪区域，添加一些边距（转换为实际像素）
+                    const padding = 10 * window.devicePixelRatio;
+                    const cropX = Math.max(0, minX - padding);
+                    const cropY = Math.max(0, minY - padding);
+                    const cropWidth = Math.min(actualWidth - cropX, maxX - minX + padding * 2);
+                    const cropHeight = Math.min(actualHeight - cropY, maxY - minY + padding * 2);
+
+                    // 创建临时canvas用于裁剪
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+
+                    // 设置临时canvas尺寸（考虑devicePixelRatio）
+                    const displayWidth = cropWidth / window.devicePixelRatio;
+                    const displayHeight = cropHeight / window.devicePixelRatio;
+                    tempCanvas.width = cropWidth;
+                    tempCanvas.height = cropHeight;
+
+                    // 填充白色背景
+                    tempCtx.fillStyle = '#fff';
+                    tempCtx.fillRect(0, 0, cropWidth, cropHeight);
+                    // 绘制裁剪后的签名（使用实际像素坐标）
+                    tempCtx.drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                    // 生成SVG格式签名
+                    const svgWidth = cropWidth / window.devicePixelRatio;
+                    const svgHeight = cropHeight / window.devicePixelRatio;
+                    const svgOffsetX = cropX / window.devicePixelRatio;
+                    const svgOffsetY = cropY / window.devicePixelRatio;
+                    // 路径优化：减少点数量（使用Ramer-Douglas-Peucker算法简化路径）
+                    function simplifyPath(points, tolerance = 0.5) {
+                        if (points.length <= 2) return points;
+
+                        let maxDistance = 0;
+                        let index = 0;
+                        const lastIndex = points.length - 1;
+                        for (let i = 1; i < lastIndex; i++) {
+                            const d = distanceToLine(points[i], points[0], points[lastIndex]);
+                            if (d > maxDistance) {
+                                maxDistance = d;
+                                index = i;
+                            }
+                        }
+                        if (maxDistance > tolerance) {
+                            const left = simplifyPath(points.slice(0, index + 1), tolerance);
+                            const right = simplifyPath(points.slice(index), tolerance);
+                            return left.slice(0, -1).concat(right);
+                        } else {
+                            return [points[0], points[lastIndex]];
+                        }
+                    }
+                    function distanceToLine(point, lineStart, lineEnd) {
+                        const A = point.x - lineStart.x;
+                        const B = point.y - lineStart.y;
+                        const C = lineEnd.x - lineStart.x;
+                        const D = lineEnd.y - lineStart.y;
+                        const dot = A * C + B * D;
+                        const lenSq = C * C + D * D;
+                        let param = -1;
+                        if (lenSq !== 0) {
+                            param = dot / lenSq;
+                        }
+                        let xx, yy;
+                        if (param < 0) {
+                            xx = lineStart.x;
+                            yy = lineStart.y;
+                        } else if (param > 1) {
+                            xx = lineEnd.x;
+                            yy = lineEnd.y;
+                        } else {
+                            xx = lineStart.x + param * C;
+                            yy = lineStart.y + param * D;
+                        }
+                        const dx = point.x - xx;
+                        const dy = point.y - yy;
+                        return Math.sqrt(dx * dx + dy * dy);
+                    }
+
+                    // 按笔划分组路径点
+                    let pathSegments = [];
+                    let currentSegment = [];
+
+                    for (let i = 0; i < signaturePaths.length; i++) {
+                        const point = signaturePaths[i];
+                        if (point.type === 'move') {
+                            // 如果已有路径段，保存它
+                            if (currentSegment.length > 0) {
+                                pathSegments.push(currentSegment);
+                            }
+                            // 开始新的路径段
+                            currentSegment = [{ x: point.x, y: point.y }];
+                        } else if (point.type === 'line') {
+                            currentSegment.push({ x: point.x, y: point.y });
+                        }
+                    }
+                    // 保存最后一个路径段
+                    if (currentSegment.length > 0) {
+                        pathSegments.push(currentSegment);
+                    }
+
+                    // 对每个笔划段进行简化
+                    const simplifiedSegments = pathSegments.map(segment => {
+                        return simplifyPath(segment, 0.8);
+                    });
+
+                    // 构建SVG路径数据 - 每个笔划段生成独立的路径命令
+                    let pathData = '';
+
+                    simplifiedSegments.forEach((segment) => {
+                        if (segment.length === 0) return;
+
+                        // 每个笔划以M命令开始
+                        pathData += `M ${(segment[0].x - svgOffsetX).toFixed(1)} ${(segment[0].y - svgOffsetY).toFixed(1)} `;
+
+                        // 添加后续的点
+                        for (let i = 1; i < segment.length; i++) {
+                            const x = segment[i].x - svgOffsetX;
+                            const y = segment[i].y - svgOffsetY;
+                            pathData += `L ${x.toFixed(1)} ${y.toFixed(1)} `;
+                        }
+                    });
+
+                    // 创建SVG内容（使用模板字符串避免HTML解析器错误识别）
+                    const svgContent = `<svg width="${svgWidth}" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">` +
+                        `<rect width="100%" height="100%" fill="white"></rect>` +
+                        `<path d="${pathData}" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>` +
+                        `</svg>`;
+
+                    // 压缩SVG内容（移除空格、换行等）
+                    const compressedSvg = svgContent
+                        .replace(/\s+/g, ' ') // 合并多个空白为单个空格
+                        .replace(/>\s+</g, '><') // 移除标签之间的空白
+                        .trim();
+                    // 使用更高效的编码方式（直接URI编码代替Base64）
+                    const encodedSvg = encodeURIComponent(compressedSvg);
+                    const base64 = `data:image/svg+xml,${encodedSvg}`;
+                    window.signatureBase64 = base64;
+                    // 隐藏签名模态框
+                    const modal = document.getElementById('signatureModal');
+                    modal.style.display = 'none';
+                    // 恢复页面滚动和交互
+                    document.body.classList.remove('signature-modal-open');
+                    // 自动提交表单
+                    performFormSubmit();
+                }
+
+                // 表单自动保存功能
+                function autoSaveForm() {
+                    try {
+                        const formData = window.collectFormData();
+                        // 仅在需要签名时添加签名数据
+                        if (signature) {
+                            formData.signature = window.signatureBase64;
+                        }
+                        localStorage.setItem('performanceFormDraft', JSON.stringify(formData));
+                        console.log('表单已自动保存');
+                    } catch (e) {
+                        console.error('自动保存失败:', e);
+                    }
+                }
+
+                // 页面加载完成后保存初始数据
+                setTimeout(() => {
+                    autoSaveForm();
+                }, 100);
+
+
+                // 实际执行表单提交的函数
+                function performFormSubmit() {
+                    const formData = window.collectFormData();
+
+                    // 仅在需要签名时添加签名数据
+                    if (signature) {
+                        formData.signature = window.signatureBase64;
+                    }
+
+                    console.log('收集的表单数据:', formData);
+                    const submitBtn = document.getElementById('submitBtn');
+                    const originalText = submitBtn ? submitBtn.textContent : '提交';
+                    window.setButtonState(true, originalText);
+
+                    const items = formData.items;
+                    let params;
+
+                    if (window.isSelfAssessment) {
+                        params = new URLSearchParams({
+                            self: form.userid,
+                            month: month,
+                            userid: userid,
+                            record: record,
+                            completion: JSON.stringify(items.map(item => item.completion || null)),
+                            selfScore: JSON.stringify(items.map(item => item.selfScore * 1 || 0))
+                        });
+                        // 仅在需要签名时添加签名参数
+                        if (signature) {
+                            params.append('signature', window.signatureBase64);
+                        }
+                    } else {
+                        // 判断是否需要隐藏CEO评分列
+                        const shouldHideCEOColumn = (userid === form["leaderid"] || checker === form["leader"]);
+                        params = new URLSearchParams({
+                            check: form.userid,
+                            month: month,
+                            userid: userid,
+                            record: record,
+                            categories: JSON.stringify(window.segments),
+                            figure: JSON.stringify(window.scoreColumns.map(s => s.match(/\d+/g)?.[0] * 1 || 0)),
+                            selfScore: JSON.stringify(items.map(item => item.selfScore * 1 || 0)),
+                            comment: JSON.stringify(items.map(item => item.comment || null)),
+                            score: JSON.stringify(items.map(item => (item.otherScores && item.otherScores[0]) * 1 || 0))
+                        });
+                        // 仅在需要签名时添加签名参数
+                        if (signature) {
+                            params.append('signature', window.signatureBase64);
+                        }
+                        // 只有在不需要隐藏CEO列时才添加ceo参数
+                        if (!shouldHideCEOColumn) {
+                            params.append('ceo', JSON.stringify(items.map(item => (item.otherScores && item.otherScores[1]) * 1 || 0)));
+                        }
+                    }
+                    const requestURL = window.submitURL + '?' + params.toString();
+                    fetch(requestURL, { method: 'GET' })
+                        .then(response => {
+                            // 检查响应状态
+                            if (!response.ok) {
+                                throw new Error('HTTP status ' + response.status);
+                            }
+                            return response.text();
+                        })
+                        .then(data => {
+                            console.log('提交响应:', data);
+                            window.handleResponse(data, originalText);
+                        })
+                        .catch((error) => {
+                            console.error('提交失败:', error);
+                            // 直接使用handleResponse处理失败
+                            window.handleResponse('error:网络请求失败', originalText);
+                        });
+                }
+                window.performFormSubmit = performFormSubmit;
+
+                // 添加事件监听
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                // 确保鼠标离开窗口也能停止绘制
+                document.addEventListener('mouseup', stopDrawing);
+                // 触摸事件支持（H5优化）
+                canvas.addEventListener('touchstart', (e) => {
+                    startDrawing(e);
+                }, { passive: true });
+                canvas.addEventListener('touchmove', (e) => {
+                    draw(e);
+                }, { passive: true });
+                canvas.addEventListener('touchend', stopDrawing, { passive: true });
+                // 确保触摸离开窗口也能停止绘制
+                document.addEventListener('touchend', stopDrawing, { passive: true });
+                // 添加触摸事件优化
+                canvas.addEventListener('touchcancel', stopDrawing, { passive: true });
+                document.addEventListener('touchcancel', stopDrawing, { passive: true });
+                clearBtn.addEventListener('click', clearSignature);
+                saveBtn.addEventListener('click', saveSignature);
+
+                // 点击模态框背景关闭
+                document.getElementById('signatureModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'signatureModal') {
+                        const modal = document.getElementById('signatureModal');
+                        modal.style.display = 'none';
+                        // 恢复页面滚动和交互
+                        document.body.classList.remove('signature-modal-open');
+                    }
+                });
+
+                // 点击关闭按钮处理
+                const closeBtn = document.querySelector('.signature-close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        const modal = document.getElementById('signatureModal');
+                        modal.style.display = 'none';
+                        // 恢复页面滚动和交互
+                        document.body.classList.remove('signature-modal-open');
+                    });
+                }
+
+                // 取消按钮点击处理 - 保留清除功能，同时添加关闭功能
+                const clearSignatureBtn = document.getElementById('clearSignatureBtn');
+                if (clearSignatureBtn) {
+                    clearSignatureBtn.addEventListener('click', (e) => {
+                        // PC端保留清除签名功能
+                        clearSignature();
+                    });
+                }
+
+                // ESC键关闭模态框
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && document.getElementById('signatureModal').style.display === 'flex') {
+                        const modal = document.getElementById('signatureModal');
+                        modal.style.display = 'none';
+                        // 恢复页面滚动和交互
+                        document.body.classList.remove('signature-modal-open');
+                    }
+                });
+
+                // 初始化清除签名 - 仅当canvas有效时执行
+                const sourceWidth = canvas.width / window.devicePixelRatio;
+                const sourceHeight = canvas.height / window.devicePixelRatio;
+                if (sourceWidth > 0 && sourceHeight > 0) {
+                    clearSignature();
+                }
+
+                // 设置自动保存定时器（每30秒保存一次）
+                const autoSaveInterval = setInterval(autoSaveForm, 30000);
+
+
+
+                // 表单提交成功后清除草稿
+                const originalHandleResponse = window.handleResponse;
+                window.handleResponse = function (data, originalText) {
+                    if (data && data.includes('success')) {
+                        // 提交成功，清除本地存储的草稿
+                        localStorage.removeItem('performanceFormDraft');
+                        alert('提交成功！');
+                        clearInterval(autoSaveInterval);
+                        window.close();
+                    } else {
+                        const errorMsg = (data && data.startsWith('error:')) ? data.substring(6) : null;
+                        alert('提交失败：' + (errorMsg || '请稍后重试'));
+                    }
+                };
+
+                // 修复模态框显示时重新计算canvas尺寸
+                const modal = document.getElementById('signatureModal');
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'style') {
+                            const displayStyle = modal.style.display;
+                            if (displayStyle === 'flex' || displayStyle === 'block') {
+                                // 模态框显示时重新设置canvas尺寸
+                                setTimeout(setupCanvas, 100);
+                            }
+                        }
+                    });
+                });
+                observer.observe(modal, { attributes: true });
+            })();
+        </script>
+    </div>
+</body>
+
+</html>
