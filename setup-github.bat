@@ -10,6 +10,16 @@ echo   2. 创建GitHub远程仓库
 echo   3. 推送代码到GitHub
 echo   4. 设置GitHub Pages公开访问
 echo.
+
+echo ========================================
+echo   项目信息配置
+echo ========================================
+echo.
+set /p PROJECT_NAME=请输入项目名称（英文，如 my-project）: 
+set /p PROJECT_DESC=请输入项目描述（如 我的个人项目）: 
+set /p COMMIT_MSG=请输入首次提交信息（如 Initial commit）: 
+echo.
+
 pause
 
 echo.
@@ -33,7 +43,7 @@ echo   第2步：提交所有文件
 echo ========================================
 echo [!] 正在添加所有文件...
 git add -A
-git commit -m "Initial commit: 绩效管理系统"
+git commit -m "%COMMIT_MSG%"
 echo [√] 文件提交完成
 echo.
 
@@ -46,15 +56,15 @@ echo.
 echo   1. 打开浏览器访问：https://github.com/new
 echo.
 echo   2. 填写仓库信息：
-echo      - Repository name: 输入仓库名称（如 singleHTML）
-echo      - Description: 绩效管理系统（可选）
+echo      - Repository name: %PROJECT_NAME%
+echo      - Description: %PROJECT_DESC%
 echo      - 选择 Public 或 Private
 echo      - 不要勾选 Add README/.gitignore/License
 echo.
 echo   3. 点击 Create repository
 echo.
 echo   4. 复制仓库地址（格式如下）：
-echo      https://github.com/你的用户名/仓库名.git
+echo      https://github.com/你的用户名/%PROJECT_NAME%.git
 echo.
 pause
 
@@ -114,12 +124,12 @@ echo [√] 推送完成！
 echo.
 
 echo ========================================
-echo   第7步：设置仓库为公开访问
+echo   第7步：设置仓库为公开访问（可选）
 echo ========================================
 echo.
-echo 请按以下步骤操作：
+echo 如需设置仓库为公开访问，请按以下步骤操作：
 echo.
-echo   1. 访问：https://github.com/你的用户名/仓库名/settings
+echo   1. 访问：https://github.com/你的用户名/%PROJECT_NAME%/settings
 echo.
 echo   2. 向下滚动到 Danger Zone 区域
 echo.
@@ -131,12 +141,12 @@ pause
 
 echo.
 echo ========================================
-echo   第8步：启用GitHub Pages
+echo   第8步：启用GitHub Pages（可选）
 echo ========================================
 echo.
-echo 请按以下步骤操作：
+echo 如需启用GitHub Pages公开访问HTML页面，请按以下步骤操作：
 echo.
-echo   1. 访问：https://github.com/你的用户名/仓库名/settings/pages
+echo   1. 访问：https://github.com/你的用户名/%PROJECT_NAME%/settings/pages
 echo.
 echo   2. 在 Build and deployment 下：
 echo      - Source: 选择 Deploy from a branch
@@ -146,7 +156,7 @@ echo.
 echo   3. 等待1-2分钟
 echo.
 echo   4. 访问地址：
-echo      https://你的用户名.github.io/仓库名/index.html
+echo      https://你的用户名.github.io/%PROJECT_NAME%/
 echo.
 pause
 
@@ -155,7 +165,9 @@ echo ========================================
 echo   完成！
 echo ========================================
 echo.
-echo 你的绩效管理系统已成功部署到GitHub！
+echo 项目 %PROJECT_NAME% 已成功部署到GitHub！
+echo.
+echo 仓库地址：https://github.com/你的用户名/%PROJECT_NAME%
 echo.
 echo 后续更新代码只需双击 push.bat 即可
 echo.
