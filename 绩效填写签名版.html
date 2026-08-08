@@ -790,8 +790,8 @@
                 提交考核表
             </button>
         </div>
+        <!-- 导入页面数据 -->
         <script>
-            // 初始化数据提交
             const form = {
                     "leader": "周雪桃",
                     "leaderid": "b96gc577",
@@ -813,13 +813,15 @@
                     "评分人文本": "自评分（30%）|上级领导评分（70%）",
                     "项目名称": "石楼社工站"
                 }
-            const dataRaw = {};
-            const month = "2026年7月"
-            const userid = "g5gaed63"
-            const record = ""
-            const checker = "陈淑贞"
-            const signature = false
-            // 初始化数据结束
+                const dataRaw = {};
+                const month = "2026年7月"
+                const userid = "g5gaed63"
+                const record = ""
+                const checker = "陈淑贞"
+                const signature = false
+        </script>
+        <!-- 导入页面数据 -->
+        <script>            
             const name = form["name"];
             const formtype = form["表格类型"]
             document.getElementById('headerTitle').textContent = month + '（' + form["项目名称"] + '项目）' + formtype + '月度工作考核表';
@@ -1897,5 +1899,4 @@
         </script>
     </div>
 </body>
-
 </html>
