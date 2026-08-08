@@ -9,6 +9,7 @@ echo   1. 初始化本地Git仓库
 echo   2. 创建GitHub远程仓库
 echo   3. 推送代码到GitHub
 echo   4. 设置GitHub Pages公开访问
+echo  开始前请确保已经有一个index页面，若没有可以通过AI为本项目设计一个入口用的index页面，通过其中的按钮，跳转到其他的页面。
 echo.
 
 echo ========================================
