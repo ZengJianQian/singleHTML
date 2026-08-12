@@ -43,11 +43,26 @@
     </script>
     <!-- 导入页面数据 -->
     <script>
-        // 检查值是否为空
+        // 检查参数是否缺失
         function isNotEmpty(value) {
             return value && value.trim() !== '';
         }
+        // 显示缺失参数的提示
+        function showMissingParams() {
+            const missing = [];
+            if (!isNotEmpty(userid)) missing.push('userid');
+            if (!isNotEmpty(password)) missing.push('password');
+            if (!isNotEmpty(targetUrl)) missing.push('targetUrl');
 
+            if (missing.length > 0) {
+                const message = document.getElementById('message');
+                message.textContent = '缺少必要参数：' + missing.join('、');
+                message.style.background = '#ff4d4f';
+                message.style.color = '#fff';
+                return true; // 有缺失
+            }
+            return false; // 无缺失
+        }
         // 检查剪贴板是否包含凭证
         async function clipboardContainsCredentials() {
             try {
@@ -82,19 +97,18 @@
 
         // 主处理逻辑
         async function processCredentials() {
-            // 情况1：任一值为空，直接跳转
-            if (!isNotEmpty(userid) || !isNotEmpty(password)) {
-                window.location.href = targetUrl;
+            // 检查参数是否缺失，缺失则显示提示并停止
+            if (showMissingParams()) {
                 return;
             }
 
-            // 情况2：剪贴板已包含凭证，直接跳转
+            // 情况1：剪贴板已包含凭证，直接跳转
             if (await clipboardContainsCredentials()) {
                 window.location.href = targetUrl;
                 return;
             }
 
-            // 情况3：值有效且剪贴板不包含，复制后提示3秒
+            // 情况2：值有效且剪贴板不包含，复制后提示3秒
             await copyCredentials();
         }
 
@@ -103,7 +117,9 @@
 
         // 5秒后无论如何都跳转（安全后备）
         setTimeout(() => {
-            window.location.href = targetUrl;
+            if (isNotEmpty(targetUrl)) {
+                window.location.href = targetUrl;
+            }
         }, 1500);
     </script>
 </body>
