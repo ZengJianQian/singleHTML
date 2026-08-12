@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>正在处理</title>
+    <title>智慧平台跳转工具</title>
+    <div class="message">通过query参数传递账号密码和路径信息，跳转到智慧平台对应位置，首次打开会提示登录。也可以跳转非智慧平台的地址，传入的账号密码会转为粘贴版内容后跳转对应位置。</div>
     <style>
         body {
             background: #f5f5f5;
@@ -38,7 +39,6 @@
             if (searchValue !== null) {
                 return searchValue;
             }
-
             // 如果search中没有，再从 window.location.hash 中获取
             const hash = window.location.hash;
             const hashQueryIndex = hash.indexOf('?');
@@ -47,7 +47,6 @@
                 const hashParams = new URLSearchParams(hashQueryString);
                 return hashParams.get(param);
             }
-
             return null;
         }
     </script>
@@ -63,7 +62,7 @@
         function isNotEmpty(value) {
             return value && value.trim() !== '';
         }
-        console.log({userid, password, targetUrl});
+        console.log({ userid, password, targetUrl });
         // 验证是否为有效的URL
         function isValidUrl(url) {
             try {
@@ -150,7 +149,7 @@
                 }
 
             } catch (err) {
-                 复制失败验证URL后跳转
+                复制失败验证URL后跳转
                 if (isValidUrl(targetUrl)) {
                     window.location.href = targetUrl;
                 } else {
@@ -169,7 +168,7 @@
             // 情况1：剪贴板已包含凭证，验证URL后跳转
             if (await clipboardContainsCredentials()) {
                 if (isValidUrl(targetUrl)) {
-                   window.location.href = targetUrl;
+                    window.location.href = targetUrl;
                 } else {
                     showInvalidUrlError();
                 }
@@ -186,7 +185,7 @@
         // 5秒后无论如何都跳转（安全后备）
         setTimeout(() => {
             if (isValidUrl(targetUrl)) {
-               window.location.href = targetUrl;
+                window.location.href = targetUrl;
             }
         }, 1500);
     </script>
