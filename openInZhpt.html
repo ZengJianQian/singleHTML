@@ -29,11 +29,11 @@
 
 <body>
     <div class="message" id="message">正在加载</div>
-    <script> // 从URL query参数获取值，如果没有则使用默认值
+    <script>
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
-        }
+        }// 从URL query参数获取值
     </script>
     <!-- 导入页面数据 -->
     <script>
@@ -47,20 +47,58 @@
         function isNotEmpty(value) {
             return value && value.trim() !== '';
         }
+
+        // 验证是否为有效的URL
+        function isValidUrl(url) {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 显示URL格式错误提示
+        function showInvalidUrlError() {
+            const message = document.getElementById('message');
+            message.innerHTML = '错误：targetUrl 格式不正确<br><br>请输入有效的URL地址（以 http:// 或 https:// 开头）<br><br>当前值：' + targetUrl;
+            message.style.background = '#ff4d4f';
+            message.style.color = '#fff';
+            message.style.textAlign = 'left';
+            message.style.lineHeight = '1.8';
+        }
         // 显示缺失参数的提示
         function showMissingParams() {
+            const message = document.getElementById('message');
+
+            // 检查是否完全没有传入任何query参数
+            if (!window.location.search || window.location.search === '') {
+                message.innerHTML = '错误：未传入任何参数<br><br>请在URL中添加以下参数：<br>userid（账号）、password（密码）、targetUrl（目标地址）<br><br>示例：<br>?userid=xxx&password=xxx&targetUrl=https://example.com';
+                message.style.background = '#ff4d4f';
+                message.style.color = '#fff';
+                message.style.textAlign = 'left';
+                message.style.lineHeight = '1.8';
+                return true;
+            }
+
             const missing = [];
             if (!isNotEmpty(userid)) missing.push('userid');
             if (!isNotEmpty(password)) missing.push('password');
             if (!isNotEmpty(targetUrl)) missing.push('targetUrl');
 
             if (missing.length > 0) {
-                const message = document.getElementById('message');
                 message.textContent = '缺少必要参数：' + missing.join('、');
                 message.style.background = '#ff4d4f';
                 message.style.color = '#fff';
                 return true; // 有缺失
             }
+
+            // 检查targetUrl是否为有效URL
+            if (!isValidUrl(targetUrl)) {
+                showInvalidUrlError();
+                return true;
+            }
+
             return false; // 无缺失
         }
         // 检查剪贴板是否包含凭证
@@ -84,14 +122,22 @@
                 const message = document.getElementById('message');
                 message.textContent = '已成功复制账号密码(' + credentials + ')，注意中间的空格。';
 
-                // 3秒后跳转
-                setTimeout(() => {
-                    window.location.href = targetUrl;
-                }, 1000);
+                // 验证URL后跳转
+                if (isValidUrl(targetUrl)) {
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 1000);
+                } else {
+                    showInvalidUrlError();
+                }
 
             } catch (err) {
-                // 复制失败直接跳转
-                window.location.href = targetUrl;
+                // 复制失败验证URL后跳转
+                if (isValidUrl(targetUrl)) {
+                    window.location.href = targetUrl;
+                } else {
+                    showInvalidUrlError();
+                }
             }
         }
 
@@ -102,9 +148,13 @@
                 return;
             }
 
-            // 情况1：剪贴板已包含凭证，直接跳转
+            // 情况1：剪贴板已包含凭证，验证URL后跳转
             if (await clipboardContainsCredentials()) {
-                window.location.href = targetUrl;
+                if (isValidUrl(targetUrl)) {
+                    window.location.href = targetUrl;
+                } else {
+                    showInvalidUrlError();
+                }
                 return;
             }
 
@@ -117,7 +167,7 @@
 
         // 5秒后无论如何都跳转（安全后备）
         setTimeout(() => {
-            if (isNotEmpty(targetUrl)) {
+            if (isValidUrl(targetUrl)) {
                 window.location.href = targetUrl;
             }
         }, 1500);
