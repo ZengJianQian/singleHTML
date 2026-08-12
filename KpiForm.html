@@ -793,35 +793,40 @@
         <!-- 导入页面数据 -->
         <script>
             const form = {
-                    "leader": "周雪桃",
-                    "leaderid": "b96gc577",
-                    "name": "陈淑贞",
-                    "userid": "g5gaed63",
-                    "任务分段": "3|1|1",
-                    "任务类别": "工作内容考核(60分)|岗位规范（10分）|团队带领（15分）",
-                    "岗位": "片长",
-                    "工作任务与内容": "KPI完成情况|部长管理工作|工作产出质量|工作规范|团队带领与管理",
-                    "标准分": "20|20|20|10|15",
-                    "模版名称": "社工站项目",
-                    "签名处文本": "上级领导签名：",
-                    "考核标准1": "当月各项服务KPI完成情况（电访、探访、个案、小组、活动、公共事务响应任务等）：由项目主任安排的当月须完成的各项服务指标，均须当月完成。每有一项拖延扣5分。\n特殊情况造成无法完成的（如天气影响、购买方要求变更等），有效解释后经项目主任同意可做调整。须在考核表中详细说明情况。",
-                    "考核标准2": "清晰个人岗位职责，高效统筹片区（站点）工作，把控各项工作产出和质量。\n①有效监管团队员工按时按质完成恒常工作指标。根据合同的年度服务指标量总量，分解到每月应该完成的固定指标量，要求100%完成月度指标量，完成80%-99%，此项扣10分，完成79%以下，此项0分。\n②有效监管团队员工按时完成当月服务文书、相关工作记录、报告等。领域团队中出现2人以上无故拖延文书的，部长此项扣10分。\n③相关工作及时回应、及时交代，包括正式会议、口头传达的工作、邮件往来等。\n④若有团队成员当月绩效考评成绩低于70分，部长在该项考核得分按每位成员直接扣减5分，如此类推。",
-                    "考核标准3": "①以优质质量完成服务KPI和文书工作（内容涵盖本月完成的各项文书记录，有计划书、总结、记录、新闻稿等），提交主任/副主任或督导来回沟通修改（上级反馈的意见）少于3次。（新入职员工在前半年可以增加到5次）\n②对项目工作的推进和改善主动积极思考，提出建设性的意见。\n④在28日前提交下月的个人工作计划，提交到主任/副主任处。",
-                    "考核标准4": "①清晰个人岗位职责；遵守社会工作专业价值和伦理操守。\n②认同并熟悉机构的MVV，遵守机构及项目规章制度、员工守则，严格遵守考勤要求。\n③个人有特殊情况及时沟通，不对项目产生不良影响。\n④积极配合项目服务发展需要、配合上级工作安排并完成相应工作。\n⑤以身作则，以积极向上的工作态度，引领团队对项目和机构有充分、正面的认识，有强的归属感。",
-                    "考核标准5": "①能够以积极正面的态度向团队员工传达工作任务、传递项目服务意义，带领团队员工，有序推进各项工作。\n②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。\n③针对员工出现的困难和问题，能够通过面谈沟通等方式，有效处理。\n④特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n⑤协同主任团队，完成与项目每一位员工的每月会谈，并为项目员工提供成长指引，完成会谈记录。",
-                    "表格类型": "片长/部长/站长/组长",
-                    "评分人文本": "自评分（30%）|上级领导评分（70%）",
-                    "项目名称": "石楼社工站"
-                }
-                const dataRaw = {};
-                const month = "2026年7月"
-                const userid = "g5gaed63"
-                const record = ""
-                const checker = "陈淑贞"
-                const signature = false
+                "leader": "周雪桃",
+                "leaderid": "b96gc577",
+                "name": "陈淑贞",
+                "userid": "g5gaed63",
+                "任务分段": "3|1|1",
+                "任务类别": "工作内容考核(60分)|岗位规范（10分）|团队带领（15分）",
+                "岗位": "片长",
+                "工作任务与内容": "KPI完成情况|部长管理工作|工作产出质量|工作规范|团队带领与管理",
+                "标准分": "20|20|20|10|15",
+                "模版名称": "社工站项目",
+                "签名处文本": "上级领导签名：",
+                "考核标准1": "当月各项服务KPI完成情况（电访、探访、个案、小组、活动、公共事务响应任务等）：由项目主任安排的当月须完成的各项服务指标，均须当月完成。每有一项拖延扣5分。\n特殊情况造成无法完成的（如天气影响、购买方要求变更等），有效解释后经项目主任同意可做调整。须在考核表中详细说明情况。",
+                "考核标准2": "清晰个人岗位职责，高效统筹片区（站点）工作，把控各项工作产出和质量。\n①有效监管团队员工按时按质完成恒常工作指标。根据合同的年度服务指标量总量，分解到每月应该完成的固定指标量，要求100%完成月度指标量，完成80%-99%，此项扣10分，完成79%以下，此项0分。\n②有效监管团队员工按时完成当月服务文书、相关工作记录、报告等。领域团队中出现2人以上无故拖延文书的，部长此项扣10分。\n③相关工作及时回应、及时交代，包括正式会议、口头传达的工作、邮件往来等。\n④若有团队成员当月绩效考评成绩低于70分，部长在该项考核得分按每位成员直接扣减5分，如此类推。",
+                "考核标准3": "①以优质质量完成服务KPI和文书工作（内容涵盖本月完成的各项文书记录，有计划书、总结、记录、新闻稿等），提交主任/副主任或督导来回沟通修改（上级反馈的意见）少于3次。（新入职员工在前半年可以增加到5次）\n②对项目工作的推进和改善主动积极思考，提出建设性的意见。\n④在28日前提交下月的个人工作计划，提交到主任/副主任处。",
+                "考核标准4": "①清晰个人岗位职责；遵守社会工作专业价值和伦理操守。\n②认同并熟悉机构的MVV，遵守机构及项目规章制度、员工守则，严格遵守考勤要求。\n③个人有特殊情况及时沟通，不对项目产生不良影响。\n④积极配合项目服务发展需要、配合上级工作安排并完成相应工作。\n⑤以身作则，以积极向上的工作态度，引领团队对项目和机构有充分、正面的认识，有强的归属感。",
+                "考核标准5": "①能够以积极正面的态度向团队员工传达工作任务、传递项目服务意义，带领团队员工，有序推进各项工作。\n②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。\n③针对员工出现的困难和问题，能够通过面谈沟通等方式，有效处理。\n④特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n⑤协同主任团队，完成与项目每一位员工的每月会谈，并为项目员工提供成长指引，完成会谈记录。",
+                "表格类型": "片长/部长/站长/组长",
+                "评分人文本": "自评分（30%）|上级领导评分（70%）",
+                "项目名称": "石楼社工站"
+            }
+            const dataRaw = {
+                "completion": "[\"本月探访26人次，电访44人次，按指标完成。个案跟进1节。活动开展一场特色活动，一场夏令营，一场集中教育。\",\"相关文书按时完成，并上传平台。\",\"服务文书质量较好，批改少于三次。\",\"能保持主动热情、微笑服务、不抱怨，主动承担工作任务。\",\"清晰岗位职责和工作内容，自觉遵守工作守则。保持正面的社工形象。\",\"保持与同事的友好相处和沟通，协助活动开展和其他任务。\",\"积极参加社协的线上培训。按时参与双百大讲坛和双百督导。\",\"协助机构行政部优化绩效流程，开发机器人的绩效功能。\"]",
+                "score": "[20,17,19,5,5,15,15,2]",
+                "selfScore": "[20,20,20,5,5,15,15,2]",
+                "comment": "[\"基本完成。\",\"部分文书还没撰写完毕，但会在规定时间内完成\",\"文书撰写良好，逻辑性强。\",\"工作态度良好。\",\"对工作岗位清晰，遵守工作规则。\",\"与同事关系友好，有时会主动为同事解答问题。\",\"积极参与培训，提升自我专业能力。\",\"积极协助机构开发机器人的绩效功能。\"]"
+            };
+            const month = "2026年7月"
+            const userid = "g5gaed63"
+            const record = ""
+            const checker = "周雪桃"
+            const signature = false
         </script>
         <!-- 导入页面数据 -->
-        <script>            
+        <script>
             const name = form["name"];
             const formtype = form["表格类型"]
             document.getElementById('headerTitle').textContent = month + '（' + form["项目名称"] + '项目）' + formtype + '月度工作考核表';
@@ -974,7 +979,7 @@
                         } else if (!isSelfScore && data.ceo && data.ceo[rowIndex] !== null && data.ceo[rowIndex] !== undefined && idx === 2) {
                             inputValue = data.ceo[rowIndex];
                         }
-                        html += `<td><input type="number" class="score-input" min="0" max="${score}" ${inputReadonly} ${tabIndex ? `tabindex="${tabIndex}"` : ''} data-row="${rowIndex}" data-field="${colText}" value="${inputValue}" oninput="if(this.value < 0 || isNaN(this.value)) this.value = ''; if(this.value > parseFloat(this.parentElement.previousElementSibling.textContent)) this.value = parseFloat(this.parentElement.previousElementSibling.textContent)"></td>`;
+                        html += `<td><input type="number" class="score-input" min="0" max="${score}" ${inputReadonly} ${tabIndex ? `tabindex="${tabIndex}"` : ''} data-row="${rowIndex}" data-field="${colText}" value="${inputValue}" data-max="${score}" oninput="var v=parseFloat(this.value);if(isNaN(v)||v<0){this.value='';return;}var m=parseFloat(this.getAttribute('data-max'));if(v>m){this.value=m;}"></td>`;
                     });
                     return html;
                 }
@@ -1177,7 +1182,191 @@
                         }
                     }
                 });
+
+                // 添加求和行和加权行
+                addSummaryRows();
             })();
+
+            // 添加求和行和加权行
+            function addSummaryRows() {
+                const tbody = document.getElementById('tableBody');
+                if (!tbody) return;
+
+                // 获取所有数据行（排除类别行）
+                const rows = tbody.querySelectorAll('tr');
+                const dataRows = [];
+                rows.forEach(row => {
+                    if (!row.classList.contains('category-row')) {
+                        dataRows.push(row);
+                    }
+                });
+
+                if (dataRows.length === 0) return;
+
+                // 获取可见的评分列信息
+                const visibleScoreColumns = [];
+                window.scoreColumns.forEach((colText, idx) => {
+                    const shouldHideColumn = (userid === form["leaderid"] || checker === form["leader"]) && idx === 2;
+                    if (!shouldHideColumn) {
+                        // 从列标题中提取百分比数值
+                        const percentageMatch = colText.match(/(\d+)%/);
+                        const percentage = percentageMatch ? parseInt(percentageMatch[1]) / 100 : 0;
+                        visibleScoreColumns.push({
+                            index: idx,
+                            text: colText,
+                            percentage: percentage
+                        });
+                    }
+                });
+
+                // 计算总列数
+                let totalCols = 4 + visibleScoreColumns.length;
+                if (!isSelfAssessment) {
+                    totalCols++; // 加上考核评语列
+                }
+
+                // 第一行：求和行
+                const sumRow = document.createElement('tr');
+                sumRow.className = 'total-row';
+                sumRow.style.background = '#fff3cd';
+                sumRow.style.fontWeight = 'bold';
+
+                // 前两列留空
+                let sumRowHTML = `<td></td><td></td>`;
+
+                // 非自评时添加考核评语列（留空）
+                if (!isSelfAssessment) {
+                    sumRowHTML += `<td></td>`;
+                }
+
+                // 标准分左侧列显示"得分"
+                sumRowHTML += `<td>得分</td>`;
+
+                // 标准分列留空
+                sumRowHTML += `<td></td>`;
+
+                // 计算每个评分列的总和
+                visibleScoreColumns.forEach(colInfo => {
+                    let columnSum = 0;
+                    dataRows.forEach(row => {
+                        const inputs = row.querySelectorAll('input.score-input');
+                        inputs.forEach(input => {
+                            const field = input.getAttribute('data-field');
+                            if (field === colInfo.text) {
+                                const value = parseFloat(input.value) || 0;
+                                columnSum += value;
+                            }
+                        });
+                    });
+                    sumRowHTML += `<td><input type="number" class="score-input total-sum-input" data-column="${colInfo.text}" value="${columnSum.toFixed(2)}" readonly tabindex="-1"></td>`;
+                });
+
+                sumRow.innerHTML = sumRowHTML;
+                tbody.appendChild(sumRow);
+
+                // 第二行：加权行（标准分 × 百分比）
+                const weightedRow = document.createElement('tr');
+                weightedRow.className = 'total-row';
+                weightedRow.style.background = '#d1ecf1';
+                weightedRow.style.fontWeight = 'bold';
+
+                // 前两列留空
+                let weightedRowHTML = `<td></td><td></td>`;
+
+                // 非自评时添加考核评语列（留空）
+                if (!isSelfAssessment) {
+                    weightedRowHTML += `<td></td>`;
+                }
+
+                // 标准分左侧列显示"加权分"
+                weightedRowHTML += `<td>加权分</td>`;
+
+                // 计算加权行标准分列的值（右侧同一行所有加权列之和）
+                let weightedRowStandardValue = 0;
+                visibleScoreColumns.forEach(colInfo => {
+                    let columnSum = 0;
+                    dataRows.forEach(row => {
+                        const inputs = row.querySelectorAll('input.score-input');
+                        inputs.forEach(input => {
+                            const field = input.getAttribute('data-field');
+                            if (field === colInfo.text) {
+                                const value = parseFloat(input.value) || 0;
+                                columnSum += value;
+                            }
+                        });
+                    });
+                    weightedRowStandardValue += columnSum * colInfo.percentage;
+                });
+                weightedRowHTML += `<td>${weightedRowStandardValue.toFixed(2)}</td>`;
+
+                // 计算每个评分列的加权值（求和值 × 百分比）
+                visibleScoreColumns.forEach(colInfo => {
+                    // 重新计算该列的总和
+                    let columnSum = 0;
+                    dataRows.forEach(row => {
+                        const inputs = row.querySelectorAll('input.score-input');
+                        inputs.forEach(input => {
+                            const field = input.getAttribute('data-field');
+                            if (field === colInfo.text) {
+                                const value = parseFloat(input.value) || 0;
+                                columnSum += value;
+                            }
+                        });
+                    });
+
+                    // 计算加权值
+                    const weightedValue = columnSum * colInfo.percentage;
+                    weightedRowHTML += `<td><input type="number" class="score-input total-weighted-input" data-column="${colInfo.text}" value="${weightedValue.toFixed(2)}" readonly tabindex="-1"></td>`;
+                });
+
+                weightedRow.innerHTML = weightedRowHTML;
+                tbody.appendChild(weightedRow);
+
+                // 为求和行的输入框添加实时计算功能
+                function updateTotals() {
+                    let weightedRowStandardValue = 0;
+
+                    // 重新计算求和行和加权行
+                    visibleScoreColumns.forEach(colInfo => {
+                        let columnSum = 0;
+                        dataRows.forEach(row => {
+                            const inputs = row.querySelectorAll('input.score-input:not(.total-sum-input):not(.total-weighted-input)');
+                            inputs.forEach(input => {
+                                const field = input.getAttribute('data-field');
+                                if (field === colInfo.text) {
+                                    const value = parseFloat(input.value) || 0;
+                                    columnSum += value;
+                                }
+                            });
+                        });
+
+                        // 更新求和行的值
+                        const sumInput = sumRow.querySelector(`input[data-column="${colInfo.text}"]`);
+                        if (sumInput) {
+                            sumInput.value = columnSum.toFixed(2);
+                        }
+
+                        // 更新加权行的值
+                        const weightedValue = columnSum * colInfo.percentage;
+                        const weightedInput = weightedRow.querySelector(`input[data-column="${colInfo.text}"]`);
+                        if (weightedInput) {
+                            weightedInput.value = weightedValue.toFixed(2);
+                        }
+                        weightedRowStandardValue += weightedValue;
+                    });
+
+                    // 更新加权行的标准分列
+                    const weightedStandardCell = weightedRow.querySelectorAll('td')[isSelfAssessment ? 3 : 4];
+                    if (weightedStandardCell) {
+                        weightedStandardCell.textContent = weightedRowStandardValue.toFixed(2);
+                    }
+                }
+
+                // 监听所有评分输入框的变化
+                document.querySelectorAll('input.score-input:not(.total-sum-input):not(.total-weighted-input)').forEach(input => {
+                    input.addEventListener('input', updateTotals);
+                });
+            }
 
             (function () {
                 const toggleBtn = document.getElementById('notesToggleBtn');
@@ -1899,4 +2088,5 @@
         </script>
     </div>
 </body>
+
 </html>
