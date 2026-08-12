@@ -143,16 +143,16 @@
                 // 验证URL后跳转
                 if (isValidUrl(targetUrl)) {
                     setTimeout(() => {
-                   //     window.location.href = targetUrl;
+                        window.location.href = targetUrl;
                     }, 1000);
                 } else {
                     showInvalidUrlError();
                 }
 
             } catch (err) {
-                // 复制失败验证URL后跳转
+                 复制失败验证URL后跳转
                 if (isValidUrl(targetUrl)) {
-                //    window.location.href = targetUrl;
+                    window.location.href = targetUrl;
                 } else {
                     showInvalidUrlError();
                 }
@@ -169,7 +169,7 @@
             // 情况1：剪贴板已包含凭证，验证URL后跳转
             if (await clipboardContainsCredentials()) {
                 if (isValidUrl(targetUrl)) {
-                //    window.location.href = targetUrl;
+                   window.location.href = targetUrl;
                 } else {
                     showInvalidUrlError();
                 }
@@ -186,7 +186,7 @@
         // 5秒后无论如何都跳转（安全后备）
         setTimeout(() => {
             if (isValidUrl(targetUrl)) {
-            //    window.location.href = targetUrl;
+               window.location.href = targetUrl;
             }
         }, 1500);
     </script>
