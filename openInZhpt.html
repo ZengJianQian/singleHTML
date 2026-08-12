@@ -30,10 +30,26 @@
 <body>
     <div class="message" id="message">正在加载</div>
     <script>
+        // 从URL query参数获取值，支持search和hash中的参数
         function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }// 从URL query参数获取值
+            // 先从 window.location.search 中获取
+            const searchParams = new URLSearchParams(window.location.search);
+            const searchValue = searchParams.get(param);
+            if (searchValue !== null) {
+                return searchValue;
+            }
+
+            // 如果search中没有，再从 window.location.hash 中获取
+            const hash = window.location.hash;
+            const hashQueryIndex = hash.indexOf('?');
+            if (hashQueryIndex !== -1) {
+                const hashQueryString = hash.substring(hashQueryIndex + 1);
+                const hashParams = new URLSearchParams(hashQueryString);
+                return hashParams.get(param);
+            }
+
+            return null;
+        }
     </script>
     <!-- 导入页面数据 -->
     <script>
