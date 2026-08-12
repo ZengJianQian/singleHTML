@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正在处理</title>
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .message {
+            background: lightsalmon;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 80%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message" id="message">正在加载</div>
+    <script> // 从URL query参数获取值，如果没有则使用默认值
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+    </script>
+    <!-- 导入页面数据 -->
+    <script>
+        const userid = getQueryParam('userid');
+        const password = getQueryParam('password');
+        const targetUrl = getQueryParam('targetUrl');
+    </script>
+    <!-- 导入页面数据 -->
+    <script>
+        // 检查值是否为空
+        function isNotEmpty(value) {
+            return value && value.trim() !== '';
+        }
+
+        // 检查剪贴板是否包含凭证
+        async function clipboardContainsCredentials() {
+            try {
+                const clipboardText = await navigator.clipboard.readText();
+                return clipboardText.includes(userid) || clipboardText.includes(password);
+            } catch (err) {
+                console.log('无法读取剪贴板:', err);
+                return false;
+            }
+        }
+
+        // 复制凭证到剪贴板
+        async function copyCredentials() {
+            try {
+                const credentials = userid + ' ' + password;
+                await navigator.clipboard.writeText(credentials);
+
+                // 显示成功消息
+                const message = document.getElementById('message');
+                message.textContent = '已成功复制账号密码(' + credentials + ')，注意中间的空格。';
+
+                // 3秒后跳转
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 1000);
+
+            } catch (err) {
+                // 复制失败直接跳转
+                window.location.href = targetUrl;
+            }
+        }
+
+        // 主处理逻辑
+        async function processCredentials() {
+            // 情况1：任一值为空，直接跳转
+            if (!isNotEmpty(userid) || !isNotEmpty(password)) {
+                window.location.href = targetUrl;
+                return;
+            }
+
+            // 情况2：剪贴板已包含凭证，直接跳转
+            if (await clipboardContainsCredentials()) {
+                window.location.href = targetUrl;
+                return;
+            }
+
+            // 情况3：值有效且剪贴板不包含，复制后提示3秒
+            await copyCredentials();
+        }
+
+        // 页面加载后立即执行
+        document.addEventListener('DOMContentLoaded', processCredentials);
+
+        // 5秒后无论如何都跳转（安全后备）
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 1500);
+    </script>
+</body>
+
+</html>
