@@ -63,7 +63,7 @@
         function isNotEmpty(value) {
             return value && value.trim() !== '';
         }
-
+        console.log({userid, password, targetUrl});
         // 验证是否为有效的URL
         function isValidUrl(url) {
             try {
@@ -98,6 +98,7 @@
             }
 
             const missing = [];
+            console.log({ userid, password, targetUrl });
             if (!isNotEmpty(userid)) missing.push('userid');
             if (!isNotEmpty(password)) missing.push('password');
             if (!isNotEmpty(targetUrl)) missing.push('targetUrl');
@@ -109,6 +110,7 @@
                 return true; // 有缺失
             }
 
+            console.log({ userid, password, targetUrl });
             // 检查targetUrl是否为有效URL
             if (!isValidUrl(targetUrl)) {
                 showInvalidUrlError();
@@ -167,7 +169,7 @@
             // 情况1：剪贴板已包含凭证，验证URL后跳转
             if (await clipboardContainsCredentials()) {
                 if (isValidUrl(targetUrl)) {
-                    window.location.href = targetUrl;
+                //    window.location.href = targetUrl;
                 } else {
                     showInvalidUrlError();
                 }
@@ -184,7 +186,7 @@
         // 5秒后无论如何都跳转（安全后备）
         setTimeout(() => {
             if (isValidUrl(targetUrl)) {
-                window.location.href = targetUrl;
+            //    window.location.href = targetUrl;
             }
         }, 1500);
     </script>
