@@ -824,9 +824,9 @@
             const record = ""
             const checker = "总监"
             const signature = ""
-            </script>
-            <!-- 导入页面数据 -->
-            <script>
+        </script>
+        <!-- 导入页面数据 -->
+        <script>
             let signatureValue = signature;
             if (typeof signature === 'string' && signature.startsWith('data:image/')) {
                 window.signatureBase64 = signature;
@@ -914,9 +914,9 @@
 
                 // 分割数据
                 const categories = taskCategories.split('|').map(s => s.trim()).filter(s => s);
-                categories.push("个人提升(15分)", "加分项(10分)");
+                categories.push("加分项(10分)");
                 const tasks = taskNames.split('|').map(s => s.trim()).filter(s => s);
-                tasks.push("个人工作能力学习与提升", "特别贡献");
+                tasks.push("特别贡献");
 
                 const segments = taskSegments.split('|').map(s => parseInt(s.trim()) || 1);
                 window.segments = segments;
@@ -931,10 +931,9 @@
                     });
                 let standardContents = standardKeys.map(key => form[key]);
 
-                // 添加固定考核标准
-                const fixedStandard1 = "①按项目和机构要求参与督导培训，注重学以致用和学习产出。<br>②积极参与项目或机构组织的共学，有意识的投入学习与提升。<br>③针对工作中存在的不足，能够接纳意见建议，积极学习和改进，并能够在第二次同类工作中呈现进步。<br>④结合工作推进情况，每月进行月度工作总结与反思。";
-                const fixedStandard2 = "加分项累计最高不超过10分：<br>①有效链接外部资源用于机构服务开展，当月链接各类资源折合3000元以下加1分；当月链接各类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。<br>②协助机构总部事务，如招投标、年会活动筹备等且表现良好（主动承担，不计较不抱怨）；得2分。<br>③所开展服务得到服务对象或购买方、合作伙伴好评或正式嘉许（提供表彰证书、锦旗、感谢信）；得2分。<br>④有效提炼服务案例或撰写专业文章，并得到相关媒体平台发表；得5分。项目在第三方评估中获得优秀成绩；得5分。<br>⑤个人获奖：个人获得行业协会、政府部门的奖励，包括优秀案例、优秀社工等；均可以得2分。<br>⑥所在团队获奖：所在团队通过团队成员共同努力，获得行业协会、政府部门的奖励；均可以得2分。<br>⑦其他对项目及机构发展的特别贡献：请具体说明；均可以得2分。";
-                standardContents.push(fixedStandard1, fixedStandard2);
+                // 添加固定考核标准               
+                const fixedStandard = "加分项累计最高不超过10分：<br>①有效链接外部资源用于机构服务开展，当月链接各类资源折合3000元以下加1分；当月链接各类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。<br>②协助机构总部事务，如招投标、年会活动筹备等且表现良好（主动承担，不计较不抱怨）；得2分。<br>③所开展服务得到服务对象或购买方、合作伙伴好评或正式嘉许（提供表彰证书、锦旗、感谢信）；得2分。<br>④有效提炼服务案例或撰写专业文章，并得到相关媒体平台发表；得5分。项目在第三方评估中获得优秀成绩；得5分。<br>⑤个人获奖：个人获得行业协会、政府部门的奖励，包括优秀案例、优秀社工等；均可以得2分。<br>⑥所在团队获奖：所在团队通过团队成员共同努力，获得行业协会、政府部门的奖励；均可以得2分。<br>⑦其他对项目及机构发展的特别贡献：请具体说明；均可以得2分。";
+                standardContents.push(fixedStandard);
 
                 let taskIndex = 0;
                 let scoreIndex = 0;
@@ -958,11 +957,7 @@
                     }
                 }
                 // 获取默认分数
-                function getDefaultScore(taskName) {
-                    if (taskName.includes('个人工作能力学习与提升')) return '15';
-                    if (taskName.includes('特别贡献')) return '10';
-                    return '';
-                }
+                const getDefaultScore = (taskName) => taskName === '特别贡献' ? '10' : '';
 
                 // 生成评分列HTML
                 function generateScoreColumnsHTML(score, rowIndex) {
@@ -1067,7 +1062,7 @@
                         const kpiRowCount = kpiStandardArray.length;
 
                         kpiStandardArray.forEach((standardItem, itemIndex) => {
-                            let score = scoreList[scoreIndex + itemIndex] || getDefaultScore(kpiTaskName);
+                            let score = scoreList[scoreIndex + itemIndex] || '10';
                             const statusId = `status-kpi-${itemIndex + 1}`;
                             const taskCellHTML = itemIndex === 0 ?
                                 `<td class="task-name" rowspan="${kpiRowCount}">${kpiTaskName}</td>` : '';
@@ -1093,7 +1088,7 @@
                         for (let i = 1; i < segmentCount; i++) {
                             if (taskIndex >= tasks.length) break;
                             const taskName = tasks[taskIndex];
-                            const score = scoreList[scoreIndex] || getDefaultScore(taskName);
+                            const score = scoreList[scoreIndex] || '10';
                             const standardContent = standardContents[standardIndex] || '';
 
                             generateTaskRow({
@@ -1113,7 +1108,7 @@
                             // 首个任务：纵向合并 firstTaskRowspan 行
                             const firstTaskName = tasks[taskIndex];
                             // 第一行：带有 rowspan 的任务名
-                            const firstScore = scoreList[scoreIndex] || getDefaultScore(firstTaskName);
+                            const firstScore = scoreList[scoreIndex] || '10';
                             const firstStandardContent = standardContents[standardIndex] || '';
                             const firstStatusId = `status-${globalRowIndex + 1}`;
                             const firstTaskCellHTML = `<td class="task-name" rowspan="${firstTaskRowspan}">${firstTaskName}</td>`;
@@ -1131,7 +1126,7 @@
 
                             // 生成剩余的合并行（同一任务名，无独立任务列）
                             for (let m = 1; m < firstTaskRowspan; m++) {
-                                const mergeScore = scoreList[scoreIndex] || getDefaultScore(firstTaskName);
+                                const mergeScore = scoreList[scoreIndex] || '10'; // getDefaultScore(firstTaskName);
                                 const mergeStandardContent = standardContents[standardIndex] || '';
                                 const mergeStatusId = `status-${globalRowIndex + 1}`;
                                 const mergeRowHTML = generateRowHTML({
@@ -1152,7 +1147,7 @@
                             for (let i = 1; i < segmentCount; i++) {
                                 if (taskIndex >= tasks.length) break;
                                 const taskName = tasks[taskIndex];
-                                const score = scoreList[scoreIndex] || getDefaultScore(taskName);
+                                const score = scoreList[scoreIndex] || '10'; // getDefaultScore(taskName);
                                 const standardContent = standardContents[standardIndex] || '';
 
                                 generateTaskRow({
@@ -1170,7 +1165,7 @@
                             for (let i = 0; i < segmentCount; i++) {
                                 if (taskIndex >= tasks.length) break;
                                 const taskName = tasks[taskIndex];
-                                const score = scoreList[scoreIndex] || getDefaultScore(taskName);
+                                const score = scoreList[scoreIndex] || '10'; // getDefaultScore(taskName);
                                 const standardContent = standardContents[standardIndex] || '';
 
                                 generateTaskRow({
