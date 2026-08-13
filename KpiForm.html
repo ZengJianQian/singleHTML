@@ -790,6 +790,13 @@
                 提交考核表
             </button>
         </div>
+        <script>
+            // 检测signature是否为base64图片
+            const isBase64Image = (val) => {
+                if (typeof val !== 'string') return false;
+                return val.startsWith('data:image/');
+            };
+        </script>
         <!-- 导入页面数据 -->
         <script>
             const form = {
@@ -810,7 +817,7 @@
                 "考核标准4": "①清晰个人岗位职责；遵守社会工作专业价值和伦理操守。\n②认同并熟悉机构的MVV，遵守机构及项目规章制度、员工守则，严格遵守考勤要求。\n③个人有特殊情况及时沟通，不对项目产生不良影响。\n④积极配合项目服务发展需要、配合上级工作安排并完成相应工作。\n⑤以身作则，以积极向上的工作态度，引领团队对项目和机构有充分、正面的认识，有强的归属感。",
                 "考核标准5": "①能够以积极正面的态度向团队员工传达工作任务、传递项目服务意义，带领团队员工，有序推进各项工作。\n②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。\n③针对员工出现的困难和问题，能够通过面谈沟通等方式，有效处理。\n④特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n⑤协同主任团队，完成与项目每一位员工的每月会谈，并为项目员工提供成长指引，完成会谈记录。",
                 "表格类型": "片长/部长/站长/组长",
-                "评分人文本": "自评分（30%）|上级领导评分（70%）",
+                "评分人文本": "自评分（30%）|上级领导评分（60%）|CEO评分（10%）",
                 "项目名称": "石楼社工站"
             }
             const dataRaw = {
@@ -822,11 +829,17 @@
             const month = "2026年7月"
             const userid = "g5gaed63"
             const record = ""
-            const checker = "周雪桃"
-            const signature = false
+            const checker = "总监"
+            const signature = ""            
         </script>
         <!-- 导入页面数据 -->
         <script>
+            // 如果传入的是base64图片，则预处理signature
+            let signatureValue = signature;
+            if (isBase64Image(signature)) {
+                window.signatureBase64 = signature;
+                signatureValue = true; // 标记需要签名
+            }
             const name = form["name"];
             const formtype = form["表格类型"]
             document.getElementById('headerTitle').textContent = month + '（' + form["项目名称"] + '项目）' + formtype + '月度工作考核表';
@@ -1504,8 +1517,12 @@
                         return;
                     }
 
-                    if (signature) {
-                        // 显示签名模态框
+                    if (signatureValue) {
+                        // 如果已有预置的base64签名图片，则直接提交，跳过签名模态框
+                        if (window.signatureBase64 && isBase64Image(signature)) {
+                            performFormSubmit();
+                            return;
+                        }
                         const modal = document.getElementById('signatureModal');
                         const modalContent = modal.querySelector('.signature-modal-content');
                         const tableWrapper = document.querySelector('.table-wrapper');
@@ -1890,7 +1907,7 @@
                     try {
                         const formData = window.collectFormData();
                         // 仅在需要签名时添加签名数据
-                        if (signature) {
+                        if (signatureValue) {
                             formData.signature = window.signatureBase64;
                         }
                         localStorage.setItem('performanceFormDraft', JSON.stringify(formData));
@@ -1911,7 +1928,7 @@
                     const formData = window.collectFormData();
 
                     // 仅在需要签名时添加签名数据
-                    if (signature) {
+                    if (signatureValue) {
                         formData.signature = window.signatureBase64;
                     }
 
@@ -1933,7 +1950,7 @@
                             selfScore: JSON.stringify(items.map(item => item.selfScore * 1 || 0))
                         });
                         // 仅在需要签名时添加签名参数
-                        if (signature) {
+                        if (signatureValue) {
                             params.append('signature', window.signatureBase64);
                         }
                     } else {
@@ -1951,7 +1968,7 @@
                             score: JSON.stringify(items.map(item => (item.otherScores && item.otherScores[0]) * 1 || 0))
                         });
                         // 仅在需要签名时添加签名参数
-                        if (signature) {
+                        if (signatureValue) {
                             params.append('signature', window.signatureBase64);
                         }
                         // 只有在不需要隐藏CEO列时才添加ceo参数
