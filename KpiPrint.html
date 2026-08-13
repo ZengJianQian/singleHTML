@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>月度工作考核表</title>
+    <title>月度工作考核表打印</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,45 @@
             background: #f5f5f5;
             padding: 10px;
             margin: 0;
+        }
+
+        .print-toolbar {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .print-toolbar button {
+            padding: 8px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .print-toolbar button:hover {
+            background: #45a049;
+        }
+
+        .print-toolbar label {
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        @media print {
+            .print-toolbar {
+                display: none;
+            }
         }
 
         .container {
@@ -87,6 +126,25 @@
             background: #f0f0f0;
             font-weight: bold;
             font-size: 12px;
+            position: relative;
+        }
+
+        th .resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: col-resize;
+            background: transparent;
+        }
+
+        th .resize-handle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        th .resize-handle:active {
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .task-name {
@@ -255,10 +313,14 @@
 
         @media print {
             @page {
-                size: A4;
+                size: A4 portrait;
                 margin: 15mm;
                 orphans: 4;
                 widows: 4;
+            }
+
+            @page landscape {
+                size: A4 landscape;
             }
 
             body {
@@ -339,6 +401,12 @@
 </head>
 
 <body>
+    <div class="print-toolbar">
+        <button onclick="window.print()">打印</button>
+        <label>
+            <input type="checkbox" id="landscapeCheck" onchange="toggleLandscape()"> 横向打印
+        </label>
+    </div>
     <div class="container">
         <div class="header">
             <h1>广州市阳光天使社会工作服务中心</h1>
@@ -472,7 +540,7 @@
                 "考核标准6": "① 规范团队日常管理，项目人员按要求着装，维护专业形象。\n② 能够按照人事管理制度参与处理项目人员的入职、转正、离职、辞退、晋升等工作。\n③ 团队成员遵守考勤纪律，无迟到、早退、旷工情况，休假按制度依规申请。",
                 "考核标准7": "①能够以积极正面的态度向团队员工传达工作任务、传递项目服务意义，带领团队员工，有序推进各项工作。\n②工作上及情感上，给予团队员工充分的支持，保障及提升团队凝聚力。\n③能够有意识培养团队骨干，根据团队骨干成长计划给予一定支持，每月与骨干复盘检视成长情况。\n④根据项目点的社工成长需求，定期开展共学，给予团队支持。\n⑤针对员工出现的困难和问题，能够通过面谈沟通等方式，有效处理。\n⑥特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n",
                 "表格类型": "主任/专项负责人",
-                "评分人文本": "自评分（20%）|总监评分（40%）|CEO/COO评分（40%）",
+                "评分人文本": "自评分(20%)|总监评分(40%)|CEO/COO评分(40%)",
                 "项目名称": "石楼社工站"
             };
             const data = {
@@ -493,6 +561,25 @@
         </script>
         <!-- 导入页面数据 -->
         <script>
+            // 横向打印切换功能
+            function toggleLandscape() {
+                const isLandscape = document.getElementById('landscapeCheck').checked;
+                const style = document.createElement('style');
+                style.id = 'landscape-style';
+
+                if (isLandscape) {
+                    style.innerHTML = '@media print { @page { size: A4 landscape; margin: 10mm; } }';
+                } else {
+                    style.innerHTML = '@media print { @page { size: A4 portrait; margin: 15mm; } }';
+                }
+
+                const existingStyle = document.getElementById('landscape-style');
+                if (existingStyle) {
+                    existingStyle.remove();
+                }
+                document.head.appendChild(style);
+            }
+
             // 处理数据格式，将字符串转换为数组
             function parseDataArray(str) {
                 try {
@@ -697,7 +784,7 @@
 
             // 更新评分人表头
             if (form["评分人文本"]) {
-                const scoreHeaders = form["评分人文本"].split('|');
+                const scoreHeaders = form["评分人文本"].replace("（", '(').replace("）", ')').split('|');
                 const scoreHeader3 = document.getElementById('scoreHeader3');
                 if (scoreHeader3) scoreHeader3.style.display = 'none';
                 // 根据数组元素显示并设置对应的表头
@@ -727,26 +814,128 @@
                 });
             }
 
+            // 全局列宽配置（用于保存用户调整后的列宽）
+            let columnConfig = [
+                { width: 3, id: null },
+                { width: 5.5, id: null },
+                { width: 6.5, id: null },
+                { width: 25, id: null },
+                { width: 'auto', id: null },
+                { width: 5, id: null },
+                { width: 5, id: null },
+                { width: 6.5, id: 'scoreHeader1' },
+                { width: 6.5, id: 'scoreHeader2' },
+                { width: 6.5, id: 'scoreHeader3' },
+                { width: 10, id: null },
+                { width: 5, id: null }
+            ];
+
+            // 初始化表格列宽调整功能
+            const initColumnResize = () => {
+                const mainTable = document.getElementById('mainTable');
+                if (!mainTable) return;
+
+                const thead = mainTable.querySelector('thead');
+                if (!thead) return;
+
+                // 移除旧的调整手柄
+                thead.querySelectorAll('.resize-handle').forEach(handle => handle.remove());
+
+                const headerCells = thead.querySelectorAll('th');
+                headerCells.forEach((th, index) => {
+                    if (th.id === 'scoreHeader3' && th.style.display === 'none') return;
+
+                    const handle = document.createElement('div');
+                    handle.className = 'resize-handle';
+                    handle.dataset.columnIndex = index;
+                    th.appendChild(handle);
+
+                    handle.addEventListener('mousedown', startColumnResize);
+                });
+            };
+
+            let resizingColumn = null;
+            let startX = 0;
+            let startWidth = 0;
+            let currentColumnIndex = 0;
+
+            const startColumnResize = (e) => {
+                e.preventDefault();
+                resizingColumn = e.target;
+                currentColumnIndex = parseInt(resizingColumn.dataset.columnIndex);
+                startX = e.clientX;
+
+                const mainTable = document.getElementById('mainTable');
+                const th = mainTable.querySelectorAll('thead th')[currentColumnIndex];
+                startWidth = th.offsetWidth;
+
+                document.addEventListener('mousemove', doColumnResize);
+                document.addEventListener('mouseup', stopColumnResize);
+            };
+
+            const doColumnResize = (e) => {
+                if (!resizingColumn) return;
+
+                const mainTable = document.getElementById('mainTable');
+                const tableWidth = mainTable.offsetWidth;
+                const diff = e.clientX - startX;
+                const newWidth = Math.max(30, startWidth + diff);
+                const newPercentage = (newWidth / tableWidth) * 100;
+
+                columnConfig[currentColumnIndex].width = newPercentage;
+
+                updateColumnWidths();
+            };
+
+            const stopColumnResize = () => {
+                resizingColumn = null;
+                document.removeEventListener('mousemove', doColumnResize);
+                document.removeEventListener('mouseup', stopColumnResize);
+            };
+
+            const updateColumnWidths = () => {
+                const mainTable = document.getElementById('mainTable');
+                if (!mainTable) return;
+
+                const isThirdColumnVisible = () => {
+                    const el = document.getElementById('scoreHeader3');
+                    return el && el.style.display !== 'none';
+                };
+
+                const calculateColumnWidths = () => {
+                    let fixedTotal = 0;
+                    const visibleThirdColumn = isThirdColumnVisible();
+
+                    columnConfig.forEach((col, index) => {
+                        if (col.width === 'auto') return;
+                        if (index === 9 && !visibleThirdColumn) return;
+                        fixedTotal += col.width;
+                    });
+
+                    const dynamicPercentage = 100 - fixedTotal;
+                    return { fixedTotal, dynamicPercentage, visibleThirdColumn };
+                };
+
+                const { dynamicPercentage, visibleThirdColumn } = calculateColumnWidths();
+
+                mainTable.querySelectorAll('th').forEach((cell, index) => {
+                    if (index >= columnConfig.length) return;
+                    const col = columnConfig[index];
+
+                    if (index === 9 && !visibleThirdColumn) {
+                        cell.style.display = 'none';
+                        return;
+                    }
+
+                    const width = col.width === 'auto' ? dynamicPercentage : col.width;
+                    cell.style.width = `${width}%`;
+                });
+            };
+
             // 自动计算并匹配签名区列宽
             const updateSignatureColumnWidths = () => {
                 const mainTable = document.getElementById('mainTable');
                 if (!mainTable) return;
-
-                // 配置项
-                const columnConfig = [
-                    { width: 3, id: null },    // 序号
-                    { width: 5.5, id: null },   // 任务类别
-                    { width: 6.5, id: null },   // 工作任务与内容
-                    { width: 25, id: null },   // 考核标准
-                    { width: 'auto', id: null }, // 完成情况（动态缓冲列）
-                    { width: 5, id: null },    // 标准分
-                    { width: 5, id: null },    // 权重(%)
-                    { width: 7, id: 'scoreHeader1' },   // 自评分(30%)
-                    { width: 7, id: 'scoreHeader2' },   // 上级领导评分(70%)
-                    { width: 7, id: 'scoreHeader3' },   // 第三评分列
-                    { width: 10, id: null },   // 考核评语
-                    { width: 5, id: null }    // 实际考核分值
-                ];
 
                 const isThirdColumnVisible = () => {
                     const el = document.getElementById('scoreHeader3');
@@ -822,12 +1011,12 @@
                         container.style.height = `${parentHeight}px`;
                     }
                 });
-
-
             }
-
             // 页面加载完成后执行
-            window.addEventListener('load', updateSignatureColumnWidths);
+            window.addEventListener('load', () => {
+                updateSignatureColumnWidths();
+                initColumnResize();
+            });
             // 窗口大小变化时重新计算
             window.addEventListener('resize', updateSignatureColumnWidths);
 
@@ -1080,18 +1269,9 @@
                 return rowHTML;
             };
 
-            // 自动添加: 个人提升（15分）
-            const personalStandard = `①按项目和机构要求参与督导培训，注重学以致用和学习产出。
-②积极参与项目或机构组织的共学，有意识的投入学习与提升。
-③针对工作中存在的不足，能够接纳意见建议，积极学习和改进，并能够在第二次同类工作中呈现进步。
-④结合工作推进情况，每月进行月度工作总结与反思。`;
-            const personalRow = generateFixedRow(catSeq + 1, '个人提升(15分)', '个人工作能力学习与提升', personalStandard, 15, 'personalself', dataIdx);
-            tbody.insertAdjacentHTML('beforeend', personalRow);
-            dataIdx++;
-
             // 自动添加: 加分项（10分）
             const bonusStandard = `加分项累计最高不超过10分：\n①有效链接外部资源用于机构服务开展，当月链接各类资源折合3000元以下加1分；当月链接各类资源折合3000-5000元加2分；当月链接各类资源折合5000元以上加3分。\n②协助机构总部事务，如招投标、年会活动筹备等且表现良好（主动承担，不计较不抱怨）；得2分。\n③所开展服务得到服务对象或购买方、合作伙伴好评或正式嘉许（提供表彰证书、锦旗、感谢信）；得2分。\n④有效提炼服务案例或撰写专业文章，并得到相关媒体平台发表；得5分。项目在第三方评估中获得优秀成绩；得5分。\n⑤个人获奖：个人获得行业协会、政府部门的奖励，包括优秀案例、优秀社工等；均可以得2分。\n⑥所在团队获奖：所在团队通过团队成员共同努力，获得行业协会、政府部门的奖励；均可以得2分。\n⑦其他对项目及机构发展的特别贡献：请具体说明；均可以得2分。`;
-            const bonusRow = generateFixedRow(catSeq + 2, '加分项(10分)', '特别贡献', bonusStandard, 10, 'bonusItem', dataIdx);
+            const bonusRow = generateFixedRow(catSeq + 1, '加分项(10分)', '特别贡献', bonusStandard, 10, 'bonusItem', dataIdx);
             tbody.insertAdjacentHTML('beforeend', bonusRow);
             dataIdx++;
 

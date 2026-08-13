@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月度工作考核表汇总</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        #tableContainer {
+            width: 100%;
+            margin: 20px auto;
+            position: relative;
+            padding-right: 10px;
+        }
+
+        #tableContainer table {
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #tableContainer .table-resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            cursor: col-resize;
+            background: transparent;
+        }
+
+        #tableContainer .table-resize-handle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        #tableContainer .table-resize-handle:active {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+
+        .header-info,
+        .header-flex {
+            text-align: center;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .header-info .year-month,
+        .header-info .org,
+        .header-flex {
+            font-weight: bold;
+        }
+
+        .header-info .year-month {
+            font-size: 14px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            text-align: left;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 10px 12px;
+            text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            font-size: 18px;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+        }
+
+        th .resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: col-resize;
+            background: transparent;
+        }
+
+        th .resize-handle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        th .resize-handle:active {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .task-name {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .standard-content {
+            text-align: left;
+            padding-left: 6px;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .status-input {
+            width: 100%;
+            min-height: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-size: 12px;
+            padding: 4px;
+            resize: none;
+            overflow: hidden;
+            font-family: inherit;
+            line-height: 1.5;
+            display: block;
+            box-sizing: border-box;
+            field-sizing: content;
+        }
+
+        .status-input:focus,
+        .score-input:focus {
+            outline: none;
+            background: #fffde7;
+        }
+
+        .score-input {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 12px;
+            padding: 0;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .score-input::-webkit-outer-spin-button,
+        .score-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        td:has(.status-input),
+        td:has(.score-input) {
+            padding: 0;
+            height: 1px;
+        }
+
+        .signature-section {
+            margin-top: -1px;
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .signature-table {
+            border-top: none;
+            border-bottom: none;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .signature-table tr {
+            display: table-row;
+        }
+
+        .signature-table td {
+            padding: 8px 5px;
+            font-size: 12px;
+            max-width: none !important;
+            width: auto;
+        }
+
+        .notes-bottom {
+            margin-top: -1px;
+            border: 1px solid #333;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .notes-bottom h4 {
+            color: #d32f2f;
+            font-size: 12px;
+            margin: 6px 0 3px 0;
+        }
+
+        .notes-bottom ol,
+        .notes-bottom ul {
+            margin-left: 22px;
+        }
+
+        .notes-bottom p {
+            margin: 3px 0;
+        }
+
+        .submit-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            padding: 12px 48px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(17, 153, 142, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .notes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: -1px 0;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+
+        .notes-table th {
+            height: 35px;
+        }
+
+        .notes-table th,
+        .notes-table td {
+            border: 1px solid #000;
+            white-space: normal;
+        }
+
+        .notes-table td {
+            padding: 1px;
+            text-align: left !important;
+            vertical-align: top !important;
+        }
+
+        .signature-col-1,
+        .signature-col-2 {
+            text-align: left !important;
+            padding: 5px 20px !important;
+        }
+
+        .notes-table ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .notes-table p {
+            text-indent: 0;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm;
+                orphans: 4;
+                widows: 4;
+            }
+
+            body {
+                background: #fff;
+                padding: 0;
+                font-size: 14px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: none;
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+
+            .header-info,
+            .header-flex {
+                font-size: 14px;
+                margin: 5px 0;
+            }
+
+            .header-info .year-month {
+                font-size: 16px;
+            }
+
+            th,
+            td {
+                padding: 6px 8px;
+                font-size: 14px;
+            }
+
+            th {
+                background: #f0f0f0 !important;
+            }
+
+            .notes-table th {
+                background: #c4c3c3 !important;
+            }
+
+            .status-input,
+            .score-input {
+                font-size: 10px;
+                padding: 2px;
+            }
+
+            .standard-content {
+                font-size: 10px;
+                line-height: 1.4;
+            }
+
+            input {
+                border: none !important;
+            }
+
+            .notes-table th,
+            .notes-table td {
+                padding: 3px 5px;
+                font-size: 10px;
+            }
+
+            .signature-table td {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+
+            .submit-section {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>广州市阳光天使社会工作服务中心</h1>
+            <div class="header-info"><span id="headerTitle" style="font-size: 22px;"></span></div>
+            <div class="header-flex">
+                <span id="checkerInfo"></span>
+                <span id="nameInfo"></span>
+            </div>
+        </div>
+        <!-- 导入页面数据 -->
+        <script>
+            const data = [{
+                姓名: "张三",
+                岗位: "社工",
+                考核分值: 100,
+            },
+            {
+                姓名: "李四",
+                岗位: "社工",
+                考核分值: 90,
+            },
+            {
+                姓名: "王五",
+                岗位: "社工",
+                考核分值: 80,
+            },
+            {
+                姓名: "赵六",
+                岗位: "社工",
+                考核分值: 70,
+            },
+            {
+                姓名: "王二",
+                岗位: "社工",
+                考核分值: 60,
+            },
+            {
+                姓名: "王二",
+                岗位: "社工",
+                考核分值: 50,
+            }]
+            const month = "2026年6月";
+            const stand = "石楼社工站"
+        </script>
+        <!-- 导入页面数据 -->
+        <script>
+            const title = month + '（' + (stand || "") + '）' + '月度考核汇总表';
+            document.getElementById('headerTitle').textContent = title;
+        </script>
+        <div id="tableContainer"></div>
+        <script>
+            const tableContainer = document.getElementById('tableContainer');
+            data.sort((a, b) => b.考核分值 - a.考核分值);// 是否自动排序
+            let tableHtml = '<table><thead><tr><th>序号</th><th>姓名</th><th>岗位</th><th>考核分值</th></tr></thead><tbody>';
+            data.forEach((item, index) => {
+                tableHtml += '<tr>';
+                tableHtml += '<td>' + (index + 1) + '</td>';
+                tableHtml += '<td>' + item.姓名 + '</td>';
+                tableHtml += '<td>' + item.岗位 + '</td>';
+                tableHtml += '<td>' + item.考核分值 + '</td>';
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</tbody></table>';
+            tableContainer.innerHTML = tableHtml;
+
+            let tableWidth = 100;
+            tableContainer.style.width = tableWidth + '%';
+
+            const tableResizeHandle = document.createElement('div');
+            tableResizeHandle.className = 'table-resize-handle';
+            tableContainer.appendChild(tableResizeHandle);
+
+            let isResizingTable = false;
+            let tableStartX = 0;
+            let tableStartWidth = 0;
+
+            tableResizeHandle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isResizingTable = true;
+                tableStartX = e.clientX;
+                tableStartWidth = tableContainer.offsetWidth;
+                document.addEventListener('mousemove', doTableResize);
+                document.addEventListener('mouseup', stopTableResize);
+            });
+
+            const doTableResize = (e) => {
+                if (!isResizingTable) return;
+                const diff = e.clientX - tableStartX;
+                const containerWidth = document.querySelector('.container').offsetWidth;
+                const newWidth = Math.max(200, tableStartWidth + diff);
+                const newPercentage = (newWidth / containerWidth) * 100;
+                tableWidth = Math.min(newPercentage, 100);
+                tableContainer.style.width = tableWidth + '%';
+            };
+
+            const stopTableResize = () => {
+                isResizingTable = false;
+                document.removeEventListener('mousemove', doTableResize);
+                document.removeEventListener('mouseup', stopTableResize);
+            };
+
+            let columnConfig = [
+                { width: 10, id: null },
+                { width: 20, id: null },
+                { width: 20, id: null },
+                { width: 50, id: null }
+            ];
+
+            const initColumnResize = () => {
+                const table = tableContainer.querySelector('table');
+                if (!table) return;
+
+                const thead = table.querySelector('thead');
+                if (!thead) return;
+
+                thead.querySelectorAll('.resize-handle').forEach(handle => handle.remove());
+
+                const headerCells = thead.querySelectorAll('th');
+                headerCells.forEach((th, index) => {
+                    const handle = document.createElement('div');
+                    handle.className = 'resize-handle';
+                    handle.dataset.columnIndex = index;
+                    th.appendChild(handle);
+
+                    handle.addEventListener('mousedown', startColumnResize);
+                });
+            };
+
+            let resizingColumn = null;
+            let startX = 0;
+            let startWidth = 0;
+            let currentColumnIndex = 0;
+
+            const startColumnResize = (e) => {
+                e.preventDefault();
+                resizingColumn = e.target;
+                currentColumnIndex = parseInt(resizingColumn.dataset.columnIndex);
+                startX = e.clientX;
+
+                const table = tableContainer.querySelector('table');
+                const th = table.querySelectorAll('thead th')[currentColumnIndex];
+                startWidth = th.offsetWidth;
+
+                document.addEventListener('mousemove', doColumnResize);
+                document.addEventListener('mouseup', stopColumnResize);
+            };
+
+            const doColumnResize = (e) => {
+                if (!resizingColumn) return;
+
+                const table = tableContainer.querySelector('table');
+                const tableWidth = table.offsetWidth;
+                const diff = e.clientX - startX;
+                const newWidth = Math.max(30, startWidth + diff);
+                const newPercentage = (newWidth / tableWidth) * 100;
+
+                columnConfig[currentColumnIndex].width = newPercentage;
+
+                updateColumnWidths();
+            };
+
+            const stopColumnResize = () => {
+                resizingColumn = null;
+                document.removeEventListener('mousemove', doColumnResize);
+                document.removeEventListener('mouseup', stopColumnResize);
+            };
+
+            const updateColumnWidths = () => {
+                const table = tableContainer.querySelector('table');
+                if (!table) return;
+
+                table.querySelectorAll('th').forEach((cell, index) => {
+                    if (index >= columnConfig.length) return;
+                    const col = columnConfig[index];
+                    cell.style.width = col.width + '%';
+                });
+
+                table.querySelectorAll('td').forEach((cell, index) => {
+                    const colIndex = index % columnConfig.length;
+                    cell.style.width = columnConfig[colIndex].width + '%';
+                });
+            };
+
+            initColumnResize();
+        </script>
+    </div>
+</body>
+
+</html>
