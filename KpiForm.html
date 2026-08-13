@@ -790,13 +790,6 @@
                 提交考核表
             </button>
         </div>
-        <script>
-            // 检测signature是否为base64图片
-            const isBase64Image = (val) => {
-                if (typeof val !== 'string') return false;
-                return val.startsWith('data:image/');
-            };
-        </script>
         <!-- 导入页面数据 -->
         <script>
             const form = {
@@ -830,15 +823,14 @@
             const userid = "g5gaed63"
             const record = ""
             const checker = "总监"
-            const signature = ""            
-        </script>
-        <!-- 导入页面数据 -->
-        <script>
-            // 如果传入的是base64图片，则预处理signature
+            const signature = ""
+            </script>
+            <!-- 导入页面数据 -->
+            <script>
             let signatureValue = signature;
-            if (isBase64Image(signature)) {
+            if (typeof signature === 'string' && signature.startsWith('data:image/')) {
                 window.signatureBase64 = signature;
-                signatureValue = true; // 标记需要签名
+                signatureValue = true;
             }
             const name = form["name"];
             const formtype = form["表格类型"]
@@ -1519,7 +1511,7 @@
 
                     if (signatureValue) {
                         // 如果已有预置的base64签名图片，则直接提交，跳过签名模态框
-                        if (window.signatureBase64 && isBase64Image(signature)) {
+                        if (window.signatureBase64 && typeof signature === 'string' && signature.startsWith('data:image/')) {
                             performFormSubmit();
                             return;
                         }
