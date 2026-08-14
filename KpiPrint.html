@@ -357,6 +357,8 @@
             td {
                 padding: 2px 4px;
                 font-size: 10px;
+                vertical-align: middle !important;
+            /*   break-inside: avoid; */  /* 禁止行跨页 */
             }
 
             th {
@@ -693,7 +695,9 @@
                             element.textContent = fallbackText;
                             element.style.verticalAlign = '';
                             element.style.minHeight = '';
-                            element.style.height = '';
+                            element.style.height = ''; 
+                            element.style.display = '';
+                            element.style.position = '';
                         };
                         element.innerHTML = '';
                         element.appendChild(img);
@@ -885,6 +889,7 @@
                 columnConfig[currentColumnIndex].width = newPercentage;
 
                 updateColumnWidths();
+                updateSignatureColumnWidths();
             };
 
             const stopColumnResize = () => {
@@ -933,6 +938,7 @@
             };
 
             // 自动计算并匹配签名区列宽
+            
             const updateSignatureColumnWidths = () => {
                 const mainTable = document.getElementById('mainTable');
                 if (!mainTable) return;
@@ -981,26 +987,27 @@
                     const width = col.width === 'auto' ? dynamicPercentage : col.width;
                     cell.style.width = `${width}%`;
                 });
-
-                // 设置签名区列宽
-                const calculateSignatureWidths = () => {
-                    let signature1Percentage = 0;
-                    const visibleThirdColumn = isThirdColumnVisible();
-                    const { dynamicPercentage } = calculateColumnWidths();
-
-                    for (let i = 0; i < 5; i++) {
-                        const col = columnConfig[i];
-                        signature1Percentage += col.width === 'auto' ? dynamicPercentage : col.width;
+                // 通过主表当前实际列宽（offsetWidth）计算签名区列宽
+                const headers = mainTable.querySelectorAll('thead th');
+                if (headers.length === 0) return;
+                let totalWidth = 0;
+                let signature1Width = 0;
+                headers.forEach((th, index) => {
+                    const w = th.offsetWidth;
+                    if (w > 0) {
+                        totalWidth += w;
+                        // 前5列对应 signature-col-1（序号、任务类别、工作任务与内容、考核标准、完成情况）
+                        if (index < 5) {
+                            signature1Width += w;
+                        }
                     }
-                    return {
-                        signature1: signature1Percentage,
-                        signature2: 100 - signature1Percentage
-                    };
-                };
-
-                const { signature1, signature2 } = calculateSignatureWidths();
-                document.querySelectorAll('.signature-col-1').forEach(col => col.style.width = `${signature1}%`);
-                document.querySelectorAll('.signature-col-2').forEach(col => col.style.width = `${signature2}%`);
+                });
+                if (totalWidth === 0) return;
+                const signature1Percent = (signature1Width / totalWidth) * 100;
+                const signature2Percent = 100 - signature1Percent;                
+                // 设置签名区列宽
+                document.querySelectorAll('.signature-col-1').forEach(col => col.style.width = `${signature1Percent}%`);
+                document.querySelectorAll('.signature-col-2').forEach(col => col.style.width = `${signature2Percent}%`);
 
                 // 调整KPI容器高度
                 document.querySelectorAll('div[style*="display: flex; width: 100%; height: 100%; align-items: stretch; position: relative;"]').forEach(container => {
