@@ -816,7 +816,10 @@
                 "岗位": "社工",
                 "模版名称": "社工站项目"
             }
-            const dataRaw = {};
+            const dataRaw = {
+                    "completion": "[\"本月探访33人次，电访23人次，按要求完成评估相关工作以及本月的兜底探访工作。趁着评估后努力在开发智慧平台的新的档案管理工具。\",\"相关文书按时完成，并上传平台。\",\"服务文书质量较好，批改少于三次。\",\"能保持主动热情、微笑服务、不抱怨，主动承担工作任务。\",\"清晰岗位职责和工作内容，自觉遵守工作守则。保持正面的社工形象。\",\"保持与同事的友好相处和沟通，协助活动开展和其他任务。\",\"本月未安排双百大讲坛，主要参与党建学习、共学、双百督导等培训课程。均按要求完成培训反思。以及完成个人成长计划。\",\"无\"]",
+                    "selfScore": "[20,20,20,5,5,15,15,0]"
+                };
             const month = "2026年8月"
             const userid = "473e4794"
             const record = ""
@@ -1991,14 +1994,26 @@
                 canvas.addEventListener('mouseout', stopDrawing);
                 // 确保鼠标离开窗口也能停止绘制
                 document.addEventListener('mouseup', stopDrawing);
-                // 触摸事件支持（H5优化）
+                // 触摸事件支持（H5优化）- 只有触控落点在手写区时才禁止滑动
+                let touchStartedOnCanvas = false;
                 canvas.addEventListener('touchstart', (e) => {
+                    touchStartedOnCanvas = true;
+                    e.preventDefault();
                     startDrawing(e);
-                }, { passive: true });
+                }, { passive: false });
                 canvas.addEventListener('touchmove', (e) => {
+                    if (touchStartedOnCanvas) {
+                        e.preventDefault();
+                    }
                     draw(e);
-                }, { passive: true });
-                canvas.addEventListener('touchend', stopDrawing, { passive: true });
+                }, { passive: false });
+                canvas.addEventListener('touchend', (e) => {
+                    if (touchStartedOnCanvas) {
+                        e.preventDefault();
+                        touchStartedOnCanvas = false;
+                    }
+                    stopDrawing(e);
+                }, { passive: false });
                 // 确保触摸离开窗口也能停止绘制
                 document.addEventListener('touchend', stopDrawing, { passive: true });
                 // 添加触摸事件优化
