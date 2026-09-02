@@ -786,7 +786,7 @@
         </div>
         <div class="submit-section" style="margin-top: 5px; text-align: center;">
             <button type="button" class="submit-btn" id="submitBtn"
-                style="padding: 8px 12px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(17, 153, 142, 0.3); transition: all 0.3s ease;">
+                style="padding: 4px 12px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(17, 153, 142, 0.3); transition: all 0.3s ease;">
                 提交考核表
             </button>
         </div>
@@ -798,7 +798,7 @@
                 "考核标准3": "①以优质质量完成服务KPI和文书工作（内容涵盖本月完成的各项文书记录，有计划书、总结、记录、新闻稿等），提交主任/副主任或督导来回沟通修改（上级反馈的意见）少于3次。（新入职员工在前半年可以增加到5次）\n②对项目工作的推进和改善主动积极思考，提出建设性的意见。\n③每月28日前提交下月具体计划到部长及主任审核。",
                 "考核标准2": "按照月度计划完成所有相关文书（个案、小组、活动套表、探访电访记录、会议记录、督导记录、新闻稿等；相关服务的新闻稿需要当天或在第二个工作日完成并提交。\n当月工作相关文书须在次月8日前完成，每拖延一天扣减5分。",
                 "考核标准1": "当月各项服务KPI完成情况（电访、探访、个案、小组、活动、公共事务响应任务等）：由项目主任安排的当月须完成的各项服务指标，均须当月完成。每有一项拖延扣5分。\n特殊情况造成无法完成的（如天气影响、购买方要求变更等），有效解释后经项目主任同意可做调整。须在考核表中详细说明情况。",
-                "inferiors": [],
+                "inferiors": [],//下属
                 "工作任务与内容": "KPI完成情况|文书完成情况|工作产出质量|礼仪及态度|工作规范|沟通合作|个人工作能力学习与提升",
                 "userid": "473e4794",
                 "leaderid": "e9177d84,7282683g",
@@ -817,9 +817,9 @@
                 "模版名称": "社工站项目"
             }
             const dataRaw = {
-                    "completion": "[\"本月探访33人次，电访23人次，按要求完成评估相关工作以及本月的兜底探访工作。趁着评估后努力在开发智慧平台的新的档案管理工具。\",\"相关文书按时完成，并上传平台。\",\"服务文书质量较好，批改少于三次。\",\"能保持主动热情、微笑服务、不抱怨，主动承担工作任务。\",\"清晰岗位职责和工作内容，自觉遵守工作守则。保持正面的社工形象。\",\"保持与同事的友好相处和沟通，协助活动开展和其他任务。\",\"本月未安排双百大讲坛，主要参与党建学习、共学、双百督导等培训课程。均按要求完成培训反思。以及完成个人成长计划。\",\"无\"]",
-                    "selfScore": "[20,20,20,5,5,15,15,0]"
-                };
+                "completion": "[\"本月探访33人次，电访23人次，按要求完成评估相关工作以及本月的兜底探访工作。趁着评估后努力在开发智慧平台的新的档案管理工具。\",\"相关文书按时完成，并上传平台。\",\"服务文书质量较好，批改少于三次。\",\"能保持主动热情、微笑服务、不抱怨，主动承担工作任务。\",\"清晰岗位职责和工作内容，自觉遵守工作守则。保持正面的社工形象。\",\"保持与同事的友好相处和沟通，协助活动开展和其他任务。\",\"本月未安排双百大讲坛，主要参与党建学习、共学、双百督导等培训课程。均按要求完成培训反思。以及完成个人成长计划。\",\"无\"]",
+                "selfScore": "[20,20,20,5,5,15,15,0]"
+            };
             const month = "2026年8月"
             const userid = "473e4794"
             const record = ""
@@ -1451,19 +1451,18 @@
                     }
                 }
 
-                submitBtn.addEventListener('click', function () {
-                    // ========== 提交前完整度校验 ==========
+                // 提取校验逻辑为独立函数
+                function validateForm() {
                     const tbody = document.querySelector('table tbody');
                     if (!tbody) {
                         alert('无法读取表格内容，请重试。');
-                        return;
+                        return false;
                     }
                     const rows = tbody.querySelectorAll('tr');
                     let emptyCount = 0;
                     const emptyByField = {};
                     let rowNumber = 0;
 
-                    // 先判断是否需要隐藏CEO列（和提交逻辑保持一致）
                     const shouldHideCEOColumn = (userid === form["leaderid"] || checker === form["leader"]);
 
                     rows.forEach(function (row) {
@@ -1473,7 +1472,6 @@
                         const textareas = row.querySelectorAll('textarea');
                         const inputs = row.querySelectorAll('input');
 
-                        // 按 data-field 检查 textarea（完成情况、考核评语）
                         textareas.forEach(function (ta) {
                             const field = ta.getAttribute('data-field') || '';
                             const label = field === 'completion' ? '完成情况' : (field === 'comment' ? '考核评语' : field);
@@ -1483,14 +1481,9 @@
                                 emptyByField[label].push(rowNumber);
                             }
                         });
-                        // 按 data-field 检查评分 input
                         inputs.forEach(function (inp) {
                             const fieldName = inp.getAttribute('data-field') || '';
-
-                            // 如果CEO列需要隐藏，则跳过检查CEO列
                             if (shouldHideCEOColumn && fieldName.includes('CEO')) return;
-
-                            // 检查所有非CEO列或需要显示的CEO列
                             if (!inp.value || isNaN(parseFloat(inp.value))) {
                                 emptyCount++;
                                 if (!emptyByField[fieldName]) emptyByField[fieldName] = [];
@@ -1503,42 +1496,63 @@
                             return label + '：' + emptyByField[label].join(',') + '行';
                         });
                         alert('还有 ' + emptyCount + ' 项未填写，请补全后再提交：\n' + detailLines.join('\n'));
-                        return;
+                        return false;
                     }
+                    return true;
+                }
 
-                    if (signatureValue) {
-                        // 如果已有预置的base64签名图片，则直接提交，跳过签名模态框
-                        if (window.signatureBase64 && typeof signature === 'string' && signature.startsWith('data:image/')) {
-                            performFormSubmit();
-                            return;
-                        }
-                        //进入签名流程
-                        const modal = document.getElementById('signatureModal');
-                        const modalContent = modal.querySelector('.signature-modal-content');
-                        const tableWrapper = document.querySelector('.table-wrapper');
-                        const table = document.querySelector('table');
+                // 弹出签名窗口
+                function showSignatureModal() {
+                    const modal = document.getElementById('signatureModal');
+                    const modalContent = modal.querySelector('.signature-modal-content');
+                    const tableWrapper = document.querySelector('.table-wrapper');
+                    const table = document.querySelector('table');
 
-                        // 禁止页面滚动和交互
-                        document.body.classList.add('signature-modal-open');
-                        modal.style.display = 'flex';
-                        // 获取表格或表格容器的宽度
-                        let targetWidth = '95%'; // 默认值
-                        if (table) {
-                            targetWidth = table.offsetWidth + 'px';
-                        } else if (tableWrapper) {
-                            targetWidth = tableWrapper.offsetWidth + 'px';
-                        }
-                        // 设置模态框内容宽度
-                        modalContent.style.maxWidth = targetWidth;
-                        modalContent.style.width = '100%';
+                    document.body.classList.add('signature-modal-open');
+                    modal.style.display = 'flex';
 
-                        modal.style.display = 'flex';
-                        // 阻止默认提交，等待签名完成后再提交
-                        return false;
-                    } else {
-                        // 跳过签名，直接提交
-                        performFormSubmit();
-                        return false;
+                    let targetWidth = '95%';
+                    if (table) {
+                        targetWidth = table.offsetWidth + 'px';
+                    } else if (tableWrapper) {
+                        targetWidth = tableWrapper.offsetWidth + 'px';
+                    }
+                    modalContent.style.maxWidth = targetWidth;
+                    modalContent.style.width = '100%';
+                }
+
+                // 双击检测变量
+                let submitClickCount = 0;
+                let submitClickTimer = null;
+                const DOUBLE_CLICK_DELAY = 300; // 毫秒
+
+                submitBtn.addEventListener('click', function () {
+                    if (!validateForm()) return;
+
+                    submitClickCount++;
+
+                    if (submitClickCount === 1) {
+                        // 第一次点击，启动计时器
+                        submitClickTimer = setTimeout(function () {
+                            // 超时，视为单击
+                            submitClickCount = 0;
+                            // 单击逻辑：检查是否可跳过签名
+                            if (signatureValue) {
+                                if (window.signatureBase64 && typeof signature === 'string' && signature.startsWith('data:image/')) {
+                                    performFormSubmit();
+                                    return;
+                                }
+                                showSignatureModal();
+                            } else {
+                                performFormSubmit();
+                            }
+                        }, DOUBLE_CLICK_DELAY);
+                    } else if (submitClickCount === 2) {
+                        // 双击，取消单击定时器
+                        clearTimeout(submitClickTimer);
+                        submitClickCount = 0;
+                        // 双击逻辑：强制进入签名流程，不跳过
+                        showSignatureModal();
                     }
                 });
 
