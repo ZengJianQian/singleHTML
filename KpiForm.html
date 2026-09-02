@@ -805,7 +805,7 @@
                 "签名处文本": "上级领导签名：",
                 "任务分段": "3|2|1|1",
                 "标准分": "20|20|20|5|5|15|15",
-                "评分人文本": "自评分（30%）|上级领导评分（70%）",
+                "评分人文本": "自评分(30%)|上级领导评分(70%)",
                 "name": "曾健乾",
                 "考核标准7": "①按项目和机构要求参与督导培训，注重学以致用和学习产出。\n\n②积极参与项目或机构组织的共学，有意识的投入学习与提升。\n\n③针对工作中存在的不足，能够接纳意见建议，积极学习和改进，并能够在第二次同类工作中呈现进步。\n\n④结合工作推进情况，每月进行月度工作总结与反思。",
                 "考核标准6": "①与工作同事的关系良好，能体谅及关怀同事。\n②能有效地协调与同事的工作，具有团队合作精神。\n③能够经常支持及配合上级的工作。\n④与辖区内服务对象、合作伙伴、购买方等建立良好的工作关系。\n⑤积极参与机构层面组织开展的各项活动，主动宣传机构服务及资讯。\n⑥特殊工作情况与团队同事及管理层有效沟通，及时处理，不在团队中造成负面氛围，不产生不良影响，积极正面、有效解决突发性问题。\n⑦每月与项目主任/副主任每月完成沟通一次，并提交沟通会谈记录。",
@@ -816,24 +816,20 @@
                 "岗位": "社工",
                 "模版名称": "社工站项目"
             }
-            const dataRaw = {
-                "completion": "[\"本月探访26人次，电访44人次，按指标完成。个案跟进1节。活动开展一场特色活动，一场夏令营，一场集中教育。\",\"相关文书按时完成，并上传平台。\",\"服务文书质量较好，批改少于三次。\",\"能保持主动热情、微笑服务、不抱怨，主动承担工作任务。\",\"清晰岗位职责和工作内容，自觉遵守工作守则。保持正面的社工形象。\",\"保持与同事的友好相处和沟通，协助活动开展和其他任务。\",\"积极参加社协的线上培训。按时参与双百大讲坛和双百督导。\",\"协助机构行政部优化绩效流程，开发机器人的绩效功能。\"]",
-                "score": "[20,17,19,5,5,15,15,2]",
-                "selfScore": "[20,20,20,5,5,15,15,2]",
-                "comment": "[\"基本完成。\",\"部分文书还没撰写完毕，但会在规定时间内完成\",\"文书撰写良好，逻辑性强。\",\"工作态度良好。\",\"对工作岗位清晰，遵守工作规则。\",\"与同事关系友好，有时会主动为同事解答问题。\",\"积极参与培训，提升自我专业能力。\",\"积极协助机构开发机器人的绩效功能。\"]"
-            };
-            const month = "2026年7月"
-            const userid = "g5gaed63"
+            const dataRaw = {};
+            const month = "2026年8月"
+            const userid = "473e4794"
             const record = ""
-            const checker = "总监"
+            const checker = "曾健乾"
             const signature = ""
         </script>
         <!-- 导入页面数据 -->
         <script>
-            let signatureValue = signature;
-            if (typeof signature === 'string' && signature.startsWith('data:image/')) {
+            // 默认需要弹出签名窗口
+            let signatureValue = true;
+            if (typeof signature === 'string' && signature.trim().length > 0 && signature.startsWith('data:image/')) {
                 window.signatureBase64 = signature;
-                signatureValue = true;
+                signatureValue = false;
             }
             const name = form["name"];
             const formtype = form["表格类型"]
@@ -1513,6 +1509,7 @@
                             performFormSubmit();
                             return;
                         }
+                        //进入签名流程
                         const modal = document.getElementById('signatureModal');
                         const modalContent = modal.querySelector('.signature-modal-content');
                         const tableWrapper = document.querySelector('.table-wrapper');
