@@ -447,7 +447,7 @@
                 tableHtml += '<td>' + (index + 1) + '</td>';
                 tableHtml += '<td>' + item.姓名 + '</td>';
                 tableHtml += '<td>' + item.岗位 + '</td>';
-                tableHtml += '<td>' + item.考核分值 + '</td>';
+                tableHtml += '<td>' + (item.考核分值 !== undefined ? item.考核分值 : '') + '</td>';
                 tableHtml += '</tr>';
             });
             tableHtml += '</tbody></table>';
