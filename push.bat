@@ -22,12 +22,12 @@ echo.
 echo ========================================
 echo.
 
-echo [1/4] 检查文件变更...
-git status --short
+echo [1/4] 检查文件变更（跳过 push.bat）...
+git status --short -- . 
 echo.
 
-echo [2/4] 添加所有变更（包括新增、修改、删除）...
-git add -A
+echo [2/4] 添加所有变更（包括新增、修改、删除），但跳过 push.bat 自身...
+git add -A -- . 
 echo.
 
 echo [3/4] 检查是否有待提交的变更...
@@ -65,7 +65,10 @@ set PUSH_SUCCESS=0
 set /a RETRY_COUNT+=1
 echo.
 echo 第 %RETRY_COUNT% 次尝试推送（最多 %MAX_RETRIES% 次）...
-git push
+
+REM 使用 PowerShell 包装 git push，添加 30 秒超时控制
+powershell -Command "$p = Start-Process -FilePath 'git' -ArgumentList 'push','--progress' -NoNewWindow -Wait -PassThru; exit $p.ExitCode"
+
 if %errorlevel% equ 0 (
     set PUSH_SUCCESS=1
     goto push_done
