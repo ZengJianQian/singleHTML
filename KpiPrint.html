@@ -36,6 +36,17 @@
             gap: 15px;
         }
 
+        @media screen and (max-width: 768px) {
+            .print-toolbar {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 10px auto;
+                justify-content: center;
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+            }
+        }
+
         .print-toolbar button {
             padding: 8px 20px;
             background: #4CAF50;
@@ -311,6 +322,31 @@
             text-indent: 0;
         }
 
+        /* 移动端响应式优化 */
+        @media screen and (max-width: 1200px) {
+            .container {
+                transform-origin: top left;
+                transform: scale(0.85);
+                width: 117.6%;
+            }
+        }
+
+        @media screen and (max-width: 900px) {
+            .container {
+                transform-origin: top left;
+                transform: scale(0.7);
+                width: 142.8%;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                transform-origin: top left;
+                transform: scale(0.5);
+                width: 200%;
+            }
+        }
+
         @media print {
             @page {
                 size: A4 portrait;
@@ -358,7 +394,8 @@
                 padding: 2px 4px;
                 font-size: 10px;
                 vertical-align: middle !important;
-            /*   break-inside: avoid; */  /* 禁止行跨页 */
+                /*   break-inside: avoid; */
+                /* 禁止行跨页 */
             }
 
             th {
@@ -695,7 +732,7 @@
                             element.textContent = fallbackText;
                             element.style.verticalAlign = '';
                             element.style.minHeight = '';
-                            element.style.height = ''; 
+                            element.style.height = '';
                             element.style.display = '';
                             element.style.position = '';
                         };
@@ -938,7 +975,7 @@
             };
 
             // 自动计算并匹配签名区列宽
-            
+
             const updateSignatureColumnWidths = () => {
                 const mainTable = document.getElementById('mainTable');
                 if (!mainTable) return;
@@ -1004,7 +1041,7 @@
                 });
                 if (totalWidth === 0) return;
                 const signature1Percent = (signature1Width / totalWidth) * 100;
-                const signature2Percent = 100 - signature1Percent;                
+                const signature2Percent = 100 - signature1Percent;
                 // 设置签名区列宽
                 document.querySelectorAll('.signature-col-1').forEach(col => col.style.width = `${signature1Percent}%`);
                 document.querySelectorAll('.signature-col-2').forEach(col => col.style.width = `${signature2Percent}%`);

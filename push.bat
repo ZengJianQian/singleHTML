@@ -7,6 +7,21 @@ echo.
 
 cd /d "%~dp0"
 
+echo [网络自检] 检查 GitHub 连接状态...
+echo.
+ping -n 4 github.com | findstr /i "TTL 请求 超时 丢失"
+echo.
+ping -n 1 -w 1000 github.com >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [通过] GitHub 连接正常
+) else (
+    echo [警告] GitHub 连接不稳定，推送可能失败
+    echo 提示：可配置代理或切换到 SSH 方式
+)
+echo.
+echo ========================================
+echo.
+
 echo [1/4] 检查文件变更...
 git status --short
 echo.
