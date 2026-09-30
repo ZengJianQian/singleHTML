@@ -442,14 +442,20 @@
             const tableContainer = document.getElementById('tableContainer');
             data.sort((a, b) => b.考核分值 - a.考核分值);// 是否自动排序
             let tableHtml = '<table><thead><tr><th>序号</th><th>姓名</th><th>岗位</th><th>考核分值</th></tr></thead><tbody>';
-            data.forEach((item, index) => {
-                tableHtml += '<tr>';
-                tableHtml += '<td>' + (index + 1) + '</td>';
-                tableHtml += '<td>' + item.姓名 + '</td>';
-                tableHtml += '<td>' + item.岗位 + '</td>';
-                tableHtml += '<td>' + (item.考核分值 !== undefined ? item.考核分值 : '') + '</td>';
-                tableHtml += '</tr>';
-            });
+
+            if (data.length === 0) {
+                tableHtml += '<tr><td colspan="4" style="padding: 12px 12px; color: #e32020; font-size: 22px;">暂无提交的考核数据</td></tr>';
+            } else {
+                data.forEach((item, index) => {
+                    tableHtml += '<tr>';
+                    tableHtml += '<td>' + (index + 1) + '</td>';
+                    tableHtml += '<td>' + item.姓名 + '</td>';
+                    tableHtml += '<td>' + item.岗位 + '</td>';
+                    tableHtml += '<td>' + (item.考核分值 !== undefined ? item.考核分值 : '') + '</td>';
+                    tableHtml += '</tr>';
+                });
+            }
+
             tableHtml += '</tbody></table>';
             tableContainer.innerHTML = tableHtml;
 
