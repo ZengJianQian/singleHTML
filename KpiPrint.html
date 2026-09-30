@@ -1178,18 +1178,26 @@
                 const rowspans = [];
                 let taskIdx = 0;
 
+                // 先按原有逻辑计算初始跨度
                 for (let c = 0; c < categories.length; c++) {
                     const taskCount = segments[c];
                     for (let t = 0; t < taskCount; t++) {
-                        // 第一个任务项的跨度 = 原有跨度 + 额外行数
-                        if (taskIdx === 0) {
-                            const baseSpan = kpiCount > 0 ? kpiCount : 1;
-                            rowspans.push(baseSpan + extraRows);
+                        if (taskIdx === 0 && kpiCount > 0) {
+                            rowspans.push(kpiCount);
                         } else {
                             rowspans.push(1);
                         }
                         taskIdx++;
                     }
+                }
+
+                // 计算当前总跨度
+                const currentTotal = rowspans.reduce((sum, val) => sum + val, 0);
+
+                // 将差额加到第一个任务上
+                const diff = totalRows - currentTotal;
+                if (diff > 0 && rowspans.length > 0) {
+                    rowspans[0] += diff;
                 }
 
                 return rowspans;
