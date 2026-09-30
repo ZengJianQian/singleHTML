@@ -1164,6 +1164,15 @@
 
             const allStandards = collectStandards();
 
+            // 计算总行数（基于标准分的元素数量）
+            const totalRows = scoreList.length;
+
+            // 计算任务分段的数值之和
+            const segmentsSum = segments.reduce((sum, val) => sum + val, 0);
+
+            // 计算差额（标准分元素数量 - 任务分段总和）
+            const extraRows = Math.max(0, totalRows - segmentsSum);
+
             // 计算任务行跨度
             const calculateTaskRowspans = () => {
                 const rowspans = [];
@@ -1172,7 +1181,13 @@
                 for (let c = 0; c < categories.length; c++) {
                     const taskCount = segments[c];
                     for (let t = 0; t < taskCount; t++) {
-                        rowspans.push(taskIdx === 0 && kpiCount > 0 ? kpiCount : 1);
+                        // 第一个任务项的跨度 = 原有跨度 + 额外行数
+                        if (taskIdx === 0) {
+                            const baseSpan = kpiCount > 0 ? kpiCount : 1;
+                            rowspans.push(baseSpan + extraRows);
+                        } else {
+                            rowspans.push(1);
+                        }
                         taskIdx++;
                     }
                 }
