@@ -770,7 +770,7 @@
             <div class="header-info" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="org" id="checkerInfo"></span>
                 <span class="org" id="nameInfo"></span>
-                <button type="button" class="notes-toggle-btn" id="notesToggleBtn">
+                <button type="button" class="notes-toggle-btn" id="notesToggleBtn" tabindex="-1">
                     <span>相关说明</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -798,23 +798,16 @@
                 <li>因评分人迟交评分表扣评分人5分/天，超过三天扣20分。</li>
             </ol>
         </div>
-        <!-- 纵向Tab切换容器 -->
-        <div class="tab-container" id="tabContainer">
-            <div class="tab-nav" id="tabNav">
-                <!-- Tab导航项由JavaScript动态生成 -->
-            </div>
-            <div class="tab-content" id="tabContent">
-                <div class="table-wrapper">
-                    <table>
-                        <thead id="tableHead">
-                            <!-- 表头由JavaScript动态生成 -->
-                        </thead>
-                        <tbody id="tableBody">
-                            <!-- 表格内容由JavaScript动态生成 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="table-wrapper">
+            <table>
+                <thead id="tableHead">
+                    <!-- 表头由JavaScript动态生成 -->
+                </thead>
+                <tbody id="tableBody">
+                    <!-- 表格内容由JavaScript动态生成 -->
+                </tbody>
+
+            </table>
         </div>
         <!-- 签名模态框 -->
         <div id="signatureModal"
@@ -1037,7 +1030,6 @@
                         const isSelfScore = (idx === 0);
                         const isReadonly = (!isSelfAssessment && isSelfScore);
                         const inputReadonly = isReadonly ? 'readonly' : '';
-                        const tabIndex = isReadonly ? '-1' : '';
                         let inputValue = '';
                         if (isSelfScore && data.selfScore && data.selfScore[rowIndex] !== null && data.selfScore[rowIndex] !== undefined) {
                             inputValue = data.selfScore[rowIndex];
@@ -1046,7 +1038,7 @@
                         } else if (!isSelfScore && data.ceo && data.ceo[rowIndex] !== null && data.ceo[rowIndex] !== undefined && idx === 2) {
                             inputValue = data.ceo[rowIndex];
                         }
-                        html += `<td><input type="number" class="score-input" min="0" max="${score}" ${inputReadonly} ${tabIndex ? `tabindex="${tabIndex}"` : ''} data-row="${rowIndex}" data-field="${colText}" value="${inputValue}" data-max="${score}" oninput="var v=parseFloat(this.value);if(isNaN(v)||v<0){this.value='';return;}var m=parseFloat(this.getAttribute('data-max'));if(v>m){this.value=m;}"></td>`;
+                        html += `<td><input type="number" class="score-input" min="0" max="${score}" ${inputReadonly} data-row="${rowIndex}" data-field="${colText}" value="${inputValue}" data-max="${score}" oninput="var v=parseFloat(this.value);if(isNaN(v)||v<0){this.value='';return;}var m=parseFloat(this.getAttribute('data-max'));if(v>m){this.value=m;}"></td>`;
                     });
                     return html;
                 }
@@ -1076,14 +1068,13 @@
                     const completion = completionValue || (data.completion && data.completion[rowIndex]) || '';
                     const isReadonly = !!statusReadonly || !isSelfAssessment;
                     const readonly = isReadonly ? 'readonly' : '';
-                    const tabIndex = isReadonly ? '-1' : '';
                     const comment = commentColumn || generateCommentColumnHTML(rowIndex);
                     const scores = scoreCols || generateScoreColumnsHTML(score, rowIndex);
 
                     return `
                         ${taskCellHTML}
                         <td class="standard-content">${standardContent}</td>
-                        <td><textarea id="${statusId}" class="status-input" rows="1" data-row="${rowIndex}" data-field="completion" ${readonly} ${tabIndex ? `tabindex="${tabIndex}"` : ''} oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">${completion}</textarea></td>
+                        <td><textarea id="${statusId}" class="status-input" rows="1" data-row="${rowIndex}" data-field="completion" ${readonly} oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';">${completion}</textarea></td>
                         ${comment}
                         <td>${score}</td>
                         ${scores}
@@ -1252,7 +1243,72 @@
 
                 // 添加求和行和加权行
                 addSummaryRows();
+
+                // 设置按列纵向的tab切换顺序
+                setColumnBasedTabIndex();
             })();
+
+            // 设置按列纵向的tab切换顺序
+            function setColumnBasedTabIndex() {
+                const tbody = document.getElementById('tableBody');
+                if (!tbody) return;
+
+                // 获取所有数据行（排除类别行和汇总行）
+                const allRows = tbody.querySelectorAll('tr');
+                const dataRows = [];
+                allRows.forEach(row => {
+                    if (!row.classList.contains('category-row') && !row.classList.contains('total-row')) {
+                        dataRows.push(row);
+                    }
+                });
+
+                if (dataRows.length === 0) return;
+
+                // 定义可输入列的顺序（按列优先）
+                // 列顺序：完成情况 -> 考核评语(如果有) -> 自评得分 -> 主管评分 -> CEO评分
+                const inputColumns = [];
+
+                // 完成情况列
+                inputColumns.push({ selector: 'textarea[data-field="completion"]', columnOrder: 0 });
+
+                // 考核评语列（仅非自评时存在）
+                if (!isSelfAssessment) {
+                    inputColumns.push({ selector: 'textarea[data-field="comment"]', columnOrder: 1 });
+                }
+
+                // 评分列（按scoreColumns的顺序）
+                let scoreColumnOrder = isSelfAssessment ? 1 : 2;
+                window.scoreColumns.forEach((colText, idx) => {
+                    const shouldHideColumn = (userid !== form["ceoid"] && checker !== form["ceo"]) && idx === 2;
+                    if (!shouldHideColumn) {
+                        inputColumns.push({
+                            selector: `input[data-field="${colText}"]`,
+                            columnOrder: scoreColumnOrder
+                        });
+                        scoreColumnOrder++;
+                    }
+                });
+
+                // 按列优先分配tabindex
+                let tabIndex = 1;
+
+                // 先按列顺序遍历
+                inputColumns.forEach(col => {
+                    // 遍历每一行，找到该列的输入框
+                    dataRows.forEach(row => {
+                        const inputs = row.querySelectorAll(col.selector);
+                        inputs.forEach(input => {
+                            // 只给可编辑的输入框设置tabindex
+                            if (!input.hasAttribute('readonly') && !input.readOnly) {
+                                input.setAttribute('tabindex', tabIndex.toString());
+                                tabIndex++;
+                            } else {
+                                input.setAttribute('tabindex', '-1');
+                            }
+                        });
+                    });
+                });
+            }
 
             // 添加求和行和加权行
             function addSummaryRows() {
