@@ -1126,11 +1126,12 @@
             while (segments.length < categories.length) segments.push(1);
 
             // 生成KPI标准HTML
+            const percent = 20;// KPI标准左右比例
             const generateKpiStandard = (kpiItem, standardText) => `
                 <div style="display: flex; width: 100%; align-items: stretch; position: relative;">
-                    <div style="width: 30%; text-align: center; padding-right: 5px; display: flex; align-items: center; justify-content: center;">${kpiItem}</div>
-                    <div style="position: absolute; left: 30%; top: 0; bottom: 0; width: 1px; background-color: #333;"></div>
-                    <div style="width: 70%; padding-left: 5px; display: flex; align-items: center;">${standardText}</div>
+                    <div style="width: ${percent}%; text-align: center; padding-right: 5px; display: flex; align-items: center; justify-content: center;">${kpiItem}</div>
+                    <div style="position: absolute; left: ${percent}%; top: 0; bottom: 0; width: 1px; background-color: #333;"></div>
+                    <div style="width: ${100 - percent}%; padding-left: 5px; display: flex; align-items: center;">${standardText}</div>
                 </div>
             `;
 
