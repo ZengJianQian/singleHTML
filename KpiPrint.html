@@ -24,16 +24,16 @@
 
         .print-toolbar {
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 6px;
+            right: 6px;
             z-index: 1000;
             background: #fff;
-            padding: 10px 15px;
+            padding: 4px;
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 5px;
         }
 
         @media screen and (max-width: 768px) {
@@ -43,7 +43,7 @@
         }
 
         .print-toolbar button {
-            padding: 8px 20px;
+            padding: 4px 8px;
             background: #4CAF50;
             color: white;
             border: none;
@@ -59,6 +59,9 @@
         .print-toolbar label {
             cursor: pointer;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         @media print {
@@ -501,7 +504,7 @@
     <div class="print-toolbar">
         <button onclick="window.print()">打印</button>
         <label>
-            <input type="checkbox" id="landscapeCheck" onchange="toggleLandscape()"> 横向打印
+            <input type="checkbox" id="landscapeCheck" onchange="toggleLandscape()"> 横向
         </label>
     </div>
     <div class="container">
