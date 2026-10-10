@@ -238,6 +238,17 @@
             font-size: 12px;
             max-width: none !important;
             width: auto;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+            border-bottom: 1px solid #333;
+        }
+
+        .signature-table tr:first-child td {
+            border-top: none;
+        }
+
+        .signature-table tr:last-child td {
+            border-bottom: none;
         }
 
         .notes-bottom {
@@ -299,7 +310,7 @@
         }
 
         .notes-table td {
-            padding: 1px;
+            padding: 5px;
             text-align: left !important;
             vertical-align: top !important;
         }
@@ -498,13 +509,34 @@
             }
         }
     </style>
+    <!-- 引入 html2canvas 和 jsPDF (使用国内稳定CDN) -->
+    <script src="https://lib.baomitu.com/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://lib.baomitu.com/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // 检测库是否加载成功
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                const hasHtml2canvas = typeof html2canvas !== 'undefined';
+                const hasJsPDF = typeof window.jspdf !== 'undefined';
+
+                if (!hasHtml2canvas || !hasJsPDF) {
+                    console.warn('PDF组件加载失败，将使用浏览器原生打印功能');
+                    const btn = document.querySelector('.print-toolbar button');
+                    if (btn) {
+                        btn.onclick = function () { window.print(); };
+                        btn.title = 'PDF组件加载失败，使用浏览器打印';
+                    }
+                }
+            }, 1500);
+        });
+    </script>
 </head>
 
 <body>
     <div class="print-toolbar">
-        <button onclick="window.print()">打印</button>
+        <button onclick="generatePDF()" title="将页面内容打印为PDF文件。若需要直接打印，可以使用Ctrl+P调用浏览器的打印功能。">打印</button>
         <label>
-            <input type="checkbox" id="landscapeCheck" onchange="toggleLandscape()"> 横向
+            <input type="checkbox" id="landscapeCheck" onchange="toggleLandscape()" title="切换为A4横向的排版进行打印。"> 横向
         </label>
     </div>
     <div class="container">
@@ -680,6 +712,296 @@
                     existingStyle.remove();
                 }
                 document.head.appendChild(style);
+            }
+
+            // 生成PDF并打印
+            /**
+             * 生成PDF并打印功能
+             * 使用 html2canvas 将页面转换为图片，再使用 jsPDF 将图片转换为PDF文件
+             */
+            async function generatePDF() {
+                // 步骤1：检查必要的库是否可用
+                const hasHtml2canvas = typeof html2canvas !== 'undefined';
+                const hasJsPDF = typeof window.jspdf !== 'undefined';
+
+                // 如果库未加载，降级为浏览器原生打印
+                if (!hasHtml2canvas || !hasJsPDF) {
+                    console.warn('PDF组件未加载，使用浏览器打印功能');
+                    window.print();
+                    return;
+                }
+
+                // 步骤2：获取页面元素和配置
+                const element = document.querySelector('.container'); // 要转换为PDF的容器元素
+                const isLandscape = document.getElementById('landscapeCheck').checked; // 是否横向打印
+                const title = document.getElementById('headerTitle').textContent || '考核表'; // PDF文件名
+
+                // 步骤3：显示加载状态，防止用户重复点击
+                const btn = document.querySelector('.print-toolbar button');
+                const originalText = btn.textContent;
+                btn.textContent = '生成中...';
+                btn.disabled = true;
+
+                // 步骤4：优化表格边框 - 移除重复的共享边框
+                // 原理：border-collapse: collapse 时，相邻单元格共享边框
+                // html2canvas 渲染时会将两个单元格的边框都画出，导致变粗
+                // 解决方案：检查所有共享边框，移除相邻单元格的对应边框
+                const tables = element.querySelectorAll('table');
+                const originalBorders = [];
+                const bordersToRemove = []; // 收集所有需要移除的边框
+
+                tables.forEach((table, tableIndex) => {
+                    originalBorders[tableIndex] = [];
+                    const rows = table.querySelectorAll('tr');
+
+                    // 第一遍：保存所有原始边框
+                    rows.forEach((row, rowIndex) => {
+                        const cells = row.querySelectorAll('th, td');
+                        cells.forEach((cell, cellIndex) => {
+                            originalBorders[tableIndex].push({
+                                element: cell,
+                                borderTop: cell.style.borderTop,
+                                borderRight: cell.style.borderRight,
+                                borderBottom: cell.style.borderBottom,
+                                borderLeft: cell.style.borderLeft,
+                                border: cell.style.border
+                            });
+                        });
+                    });
+
+                    // 第二遍：基于实际位置检查所有共享边框
+                    const allCells = table.querySelectorAll('th, td');
+                    const cellRects = [];
+
+                    // 获取所有单元格的位置信息
+                    allCells.forEach(cell => {
+                        const rect = cell.getBoundingClientRect();
+                        cellRects.push({
+                            element: cell,
+                            top: rect.top,
+                            bottom: rect.bottom,
+                            left: rect.left,
+                            right: rect.right
+                        });
+                    });
+
+                    // 对每个单元格，检查是否有相邻单元格
+                    cellRects.forEach(cell1 => {
+                        // 检查右边框：是否有其他单元格的左边框与当前单元格的右边框相邻
+                        for (const cell2 of cellRects) {
+                            if (cell1 === cell2) continue;
+
+                            // 检查水平相邻（cell2在cell1右边）
+                            const isRightAdjacent = Math.abs(cell2.left - cell1.right) < 2;
+                            // 检查垂直方向是否有重叠
+                            const hasVerticalOverlap = !(cell2.bottom <= cell1.top || cell2.top >= cell1.bottom);
+
+                            if (isRightAdjacent && hasVerticalOverlap) {
+                                // 优先移除右边单元格的左边框
+                                const computedStyle = window.getComputedStyle(cell2.element);
+                                const hasLeftBorder = computedStyle.borderLeftWidth !== '0px' && computedStyle.borderLeftStyle !== 'none';
+                                if (hasLeftBorder) {
+                                    bordersToRemove.push({ element: cell2.element, border: 'borderLeft' });
+                                } else {
+                                    // 如果左边没有边框，移除当前单元格的右边框
+                                    const currentStyle = window.getComputedStyle(cell1.element);
+                                    const hasRightBorder = currentStyle.borderRightWidth !== '0px' && currentStyle.borderRightStyle !== 'none';
+                                    if (hasRightBorder) {
+                                        bordersToRemove.push({ element: cell1.element, border: 'borderRight' });
+                                    }
+                                }
+                            }
+                        }
+
+                        // 检查下边框：是否有其他单元格的上边框与当前单元格的下边框相邻
+                        for (const cell2 of cellRects) {
+                            if (cell1 === cell2) continue;
+
+                            // 检查垂直相邻（cell2在cell1下边）
+                            const isBottomAdjacent = Math.abs(cell2.top - cell1.bottom) < 2;
+                            // 检查水平方向是否有重叠
+                            const hasHorizontalOverlap = !(cell2.right <= cell1.left || cell2.left >= cell1.right);
+
+                            if (isBottomAdjacent && hasHorizontalOverlap) {
+                                // 优先移除下边单元格的上边框
+                                const computedStyle = window.getComputedStyle(cell2.element);
+                                const hasTopBorder = computedStyle.borderTopWidth !== '0px' && computedStyle.borderTopStyle !== 'none';
+                                if (hasTopBorder) {
+                                    bordersToRemove.push({ element: cell2.element, border: 'borderTop' });
+                                } else {
+                                    // 如果上边没有边框，移除当前单元格的下边框
+                                    const currentStyle = window.getComputedStyle(cell1.element);
+                                    const hasBottomBorder = currentStyle.borderBottomWidth !== '0px' && currentStyle.borderBottomStyle !== 'none';
+                                    if (hasBottomBorder) {
+                                        bordersToRemove.push({ element: cell1.element, border: 'borderBottom' });
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+
+                // 统一移除所有需要移除的边框
+                bordersToRemove.forEach(item => {
+                    item.element.style[item.border] = 'none';
+                });
+
+                // 等待DOM更新完成
+                await new Promise(resolve => setTimeout(resolve, 50));
+
+                // 步骤5：使用 html2canvas 将DOM转换为Canvas图片
+                html2canvas(element, {
+                    scale: 3, // 3倍缩放，提高渲染精度
+                    useCORS: true, // 允许跨域图片
+                    logging: false, // 关闭日志
+                    letterRendering: true, // 优化文字渲染
+                    backgroundColor: '#FFFFFF', // 白色背景
+                    windowWidth: element.scrollWidth, // 完整宽度
+                    windowHeight: element.scrollHeight, // 完整高度
+                    imageTimeout: 0, // 图片加载超时
+                    foreignObjectRendering: false // 使用Canvas渲染（更稳定）
+                }).then(canvas => {
+                    // 步骤6：恢复原始边框样式
+                    tables.forEach((table, tableIndex) => {
+                        originalBorders[tableIndex].forEach(cellData => {
+                            cellData.element.style.borderTop = cellData.borderTop;
+                            cellData.element.style.borderRight = cellData.borderRight;
+                            cellData.element.style.borderBottom = cellData.borderBottom;
+                            cellData.element.style.borderLeft = cellData.borderLeft;
+                            cellData.element.style.border = cellData.border;
+                        });
+                    });
+
+                    // 步骤7：初始化 jsPDF
+                    const { jsPDF } = window.jspdf;
+
+                    // A4 纸张尺寸 (mm)
+                    const pdfWidth = isLandscape ? 297 : 210;
+                    const pdfHeight = isLandscape ? 210 : 297;
+                    const margin = 3; // 页边距 (mm)，使用更窄的边距
+
+                    // 计算PDF可用内容区域
+                    const contentWidth = pdfWidth - margin * 2;
+                    const contentHeight = pdfHeight - margin * 2;
+
+                    // 获取Canvas图片尺寸（scale=3，所以实际像素是显示尺寸的3倍）
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+
+                    // 计算缩放比例：使内容宽度适配PDF页面宽度
+                    const scaleRatio = contentWidth / (imgWidth / 3);
+
+                    // 计算缩放后的总高度（mm）
+                    const totalHeightMm = (imgHeight / 3) * scaleRatio;
+
+                    // 创建 PDF 对象
+                    const pdf = new jsPDF({
+                        orientation: isLandscape ? 'landscape' : 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    // 步骤8：智能分页 - 避免在表格行中间分页
+                    // 获取所有表格行的位置信息
+                    const rowBoundaries = []; // 存储每行的起始和结束位置（相对于容器）
+                    const allTables = element.querySelectorAll('table');
+                    const containerRect = element.getBoundingClientRect();
+
+                    allTables.forEach(table => {
+                        const rows = table.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const rowRect = row.getBoundingClientRect();
+                            const rowTop = rowRect.top - containerRect.top + element.scrollTop;
+                            const rowBottom = rowTop + rowRect.height;
+                            rowBoundaries.push({ top: rowTop, bottom: rowBottom });
+                        });
+                    });
+
+                    // 计算安全分页点（在行与行之间分页）
+                    function findSafeBreakPoint(targetY) {
+                        // 如果目标位置在某个行内，调整到该行的底部
+                        for (const row of rowBoundaries) {
+                            if (targetY > row.top && targetY < row.bottom) {
+                                return row.bottom; // 移到行底部
+                            }
+                        }
+                        return targetY; // 不在任何行内，直接返回
+                    }
+
+                    // 重新计算分页位置
+                    const pageBreaks = [];
+                    let currentY = 0;
+                    const contentHeightPx = (contentHeight / scaleRatio) * 3; // 每页高度（像素）
+
+                    while (currentY < imgHeight) {
+                        let breakY = currentY + contentHeightPx;
+                        if (breakY < imgHeight) {
+                            // 找到安全的分页点
+                            breakY = findSafeBreakPoint(breakY);
+                            // 确保不会跳过太多内容（最多允许跳过一行的高度）
+                            if (breakY - currentY > contentHeightPx * 1.5) {
+                                breakY = currentY + contentHeightPx;
+                            }
+                        }
+                        pageBreaks.push(breakY);
+                        currentY = breakY;
+                    }
+
+                    const totalPages = pageBreaks.length;
+
+                    // 步骤9：分页处理，将大图片分割成多页PDF
+                    for (let page = 0; page < totalPages; page++) {
+                        // 除第一页外，每页添加新页面
+                        if (page > 0) {
+                            pdf.addPage();
+                        }
+
+                        // 计算当前页在原始canvas中的起始和结束位置（像素）
+                        const startYpx = page === 0 ? 0 : pageBreaks[page - 1];
+                        const endYpx = pageBreaks[page];
+                        const pageHeightpx = endYpx - startYpx;
+                        const pageHeightmm = (pageHeightpx / 3) * scaleRatio;
+
+                        // 创建当前页的 canvas
+                        const pageCanvas = document.createElement('canvas');
+                        pageCanvas.width = imgWidth;
+                        pageCanvas.height = Math.ceil(pageHeightpx);
+                        const ctx = pageCanvas.getContext('2d');
+
+                        // 填充白色背景，防止透明区域
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
+                        // 从原始canvas截取对应区域
+                        ctx.drawImage(
+                            canvas,
+                            0, Math.floor(startYpx), // 源图起始位置
+                            imgWidth, Math.ceil(pageHeightpx), // 源图尺寸
+                            0, 0, imgWidth, Math.ceil(pageHeightpx) // 目标图尺寸
+                        );
+
+                        // 将当前页图片添加到PDF
+                        pdf.addImage(
+                            pageCanvas.toDataURL('image/jpeg', 0.95), // 95%质量的JPEG
+                            'JPEG',
+                            margin, margin, // 位置
+                            contentWidth, pageHeightmm // 尺寸
+                        );
+                    }
+
+                    // 步骤10：保存PDF文件
+                    pdf.save(`${title}.pdf`);
+
+                    // 恢复按钮状态
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }).catch(err => {
+                    // 错误处理
+                    console.error('PDF生成失败:', err);
+                    alert('PDF生成失败，请重试或使用浏览器打印功能');
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                });
             }
 
             // 处理数据格式，将字符串转换为数组
@@ -999,6 +1321,25 @@
                 document.removeEventListener('mouseup', stopColumnResize);
             };
 
+            // 更新KPI分隔线位置
+            const updateKpiDividerPosition = () => {
+                const dividers = document.querySelectorAll('.kpi-divider');
+                // 若该中线并未生成，则不进行调整
+                if (dividers.length === 0) return;
+
+                const kpiPercent = 25; // 与第1469行的percent保持一致
+                const thirdColWidth = columnConfig[2].width;  // 第三列：工作任务与内容
+                const fourthColWidth = columnConfig[3].width; // 第四列：考核标准
+
+                if (!thirdColWidth || !fourthColWidth) return;
+
+                const leftPercent = (fourthColWidth * kpiPercent / thirdColWidth) + 101;
+
+                dividers.forEach(divider => {
+                    divider.style.left = `${leftPercent}%`;
+                });
+            };
+
             const updateColumnWidths = () => {
                 const mainTable = document.getElementById('mainTable');
                 if (!mainTable) return;
@@ -1036,6 +1377,9 @@
                     const width = col.width === 'auto' ? dynamicPercentage : col.width;
                     cell.style.width = `${width}%`;
                 });
+
+                // 更新KPI分隔线位置
+                updateKpiDividerPosition();
             };
 
             // 自动计算并匹配签名区列宽

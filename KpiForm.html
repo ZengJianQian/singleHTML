@@ -2222,6 +2222,90 @@
                     }
                 };
 
+                // 鼠标在获得焦点的输入框范围内时，阻止页面滚动（数字输入框除外）
+                (function () {
+                    let focusedInput = null;
+                    let wheelHandled = false;
+                    let keyHandled = false;
+
+                    function handleWheel(e) {
+                        e.preventDefault();
+                    }
+
+                    function adjustNumberValue(target, direction, step = 1) {
+                        const max = parseFloat(target.getAttribute('max'));
+                        const min = parseFloat(target.getAttribute('min')) || 0;
+                        let current = parseFloat(target.value);
+
+                        // 若框内原本为空或无效值，首次滚动直接设置为最大值
+                        if (isNaN(current) || target.value === '') {
+                            target.value = max;
+                            target.dispatchEvent(new Event('input', { bubbles: true }));
+                            return;
+                        }
+
+                        // 根据方向调整数值
+                        if (direction === 'up') {
+                            current = Math.min(current + step, max);
+                        } else {
+                            current = Math.max(current - step, min);
+                        }
+
+                        target.value = current;
+                        // 触发input事件以更新相关计算
+                        target.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    function handleNumberWheel(e) {
+                        if (wheelHandled) return;
+                        wheelHandled = true;
+                        setTimeout(() => { wheelHandled = false; }, 100);
+
+                        e.preventDefault();
+                        const direction = e.deltaY < 0 ? 'up' : 'down';
+                        const step = e.ctrlKey ? 5 : 1;
+                        adjustNumberValue(e.target, direction, step);
+                    }
+
+                    function handleNumberKey(e) {
+                        if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+                        if (keyHandled) return;
+                        keyHandled = true;
+                        setTimeout(() => { keyHandled = false; }, 100);
+
+                        e.preventDefault();
+                        const direction = e.key === 'ArrowUp' ? 'up' : 'down';
+                        const step = e.ctrlKey ? 5 : 1;
+                        adjustNumberValue(e.target, direction, step);
+                    }
+
+                    document.addEventListener('focusin', function (e) {
+                        const target = e.target;
+                        if (target.matches('input, textarea, select')) {
+                            focusedInput = target;
+                            // 数字输入框不阻止滚轮，允许通过滚轮调整数值
+                            if (target.type === 'number') {
+                                target.addEventListener('wheel', handleNumberWheel, { passive: false });
+                                target.addEventListener('keydown', handleNumberKey, { passive: false });
+                            } else {
+                                target.addEventListener('wheel', handleWheel, { passive: false });
+                            }
+                        }
+                    });
+
+                    document.addEventListener('focusout', function (e) {
+                        const target = e.target;
+                        if (target.matches('input, textarea, select')) {
+                            target.removeEventListener('wheel', handleWheel);
+                            target.removeEventListener('wheel', handleNumberWheel);
+                            target.removeEventListener('keydown', handleNumberKey);
+                            focusedInput = null;
+                            wheelHandled = false;
+                            keyHandled = false;
+                        }
+                    });
+                })();
+
                 // 修复模态框显示时重新计算canvas尺寸
                 const modal = document.getElementById('signatureModal');
                 const observer = new MutationObserver((mutations) => {
