@@ -419,6 +419,19 @@
                 width: 100%;
             }
 
+            .kpi-divider {
+                height: 100% !important;
+                min-height: 100px;
+            }
+
+            .kpi-standard-cell {
+                position: relative !important;
+            }
+
+            .task-name {
+                position: relative !important;
+            }
+
             .header h1 {
                 font-size: 16px;
                 margin-bottom: 3px;
@@ -1128,10 +1141,9 @@
             // 生成KPI标准HTML
             const percent = 25;// KPI标准左右比例
             const generateKpiStandard = (kpiItem, standardText) => `
-                <div class="kpi-standard-container" style="display: flex; width: 100%; align-items: stretch; position: relative;">
-                    <div style="width: ${percent}%; text-align: center; padding: 5px; display: flex; align-items: center; justify-content: center;">${kpiItem}</div>
-                    <div style="position: absolute; left: ${percent}%; top: 0; bottom: 0; width: 1px; background-color: #333;"></div>
-                    <div style="width: ${100 - percent}%; padding: 5px; display: flex; align-items: center;">${standardText}</div>
+                <div style="display: flex; width: 100%; align-items: stretch; position: relative;">
+                    <div style="width: ${percent}%; text-align: center; padding: 5px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 0;">${kpiItem}</div>
+                    <div style="width: ${100 - percent}%; padding: 5px; display: flex; align-items: center; position: relative; z-index: 0;">${standardText}</div>
                 </div>
             `;
 
@@ -1266,13 +1278,19 @@
 
                         // 列3: 工作任务与内容（按任务合并）
                         if (sub === 0) {
+                            const taskCellContent = taskName;
+                            // 如果是KPI相关行，添加分隔线
+                            const taskCellStyle = (kpiCount > 0 && c === 0 && t === 0) ?
+                                'style="position: relative;"' : '';
+                            const dividerHTML = (kpiCount > 0 && c === 0 && t === 0) ?
+                                `<div class="kpi-divider" style="position: absolute; left: 199%; top: 0; bottom: 0; width: 1px; background-color: #333; z-index: 1;"></div>` : '';
+                            // KPI细项的中线设置 
                             if (taskRowspan > 1) {
-                                rowHTML += '<td class="task-name" rowspan="' + taskRowspan + '">' + taskName + '</td>';
+                                rowHTML += `<td class="task-name" rowspan="${taskRowspan}" ${taskCellStyle}>${taskCellContent}${dividerHTML}</td>`;
                             } else {
-                                rowHTML += '<td class="task-name">' + taskName + '</td>';
+                                rowHTML += `<td class="task-name" ${taskCellStyle}>${taskCellContent}${dividerHTML}</td>`;
                             }
                         }
-
                         // 列4: 考核标准
                         let standardCellClass = 'standard-content';
                         let standardCellStyle = '';
@@ -1412,92 +1430,26 @@
 
             tbody.insertAdjacentHTML('beforeend', totalRowHTML);
 
-            // 动态同步KPI标准容器高度与父元素一致
-            const syncKpiContainerHeights = () => {
-                const kpiContainers = document.querySelectorAll('.kpi-standard-container');
-                if (kpiContainers.length === 0) return false;
-
-                // 获取表格所有行
-                const allRows = document.querySelectorAll('#tableBody tr');
-                if (allRows.length === 0) return false;
-
-                // 为每个KPI容器单独计算高度
-                let allSynced = true;
-                kpiContainers.forEach((container, index) => {
-                    // 获取当前容器所在的td单元格
-                    const kpiCell = container.closest('td');
-                    if (!kpiCell) {
-                        allSynced = false;
-                        return;
-                    }
-
-                    // 获取该单元格的rowspan值
-                    const rowspan = parseInt(kpiCell.getAttribute('rowspan')) || 1;
-
-                    // 找到该单元格起始行的索引
-                    let startRowIndex = -1;
-                    for (let i = 0; i < allRows.length; i++) {
-                        const cells = allRows[i].cells;
-                        for (let j = 0; j < cells.length; j++) {
-                            if (cells[j] === kpiCell) {
-                                startRowIndex = i;
-                                break;
-                            }
-                        }
-                        if (startRowIndex !== -1) break;
-                    }
-
-                    if (startRowIndex === -1) {
-                        allSynced = false;
-                        return;
-                    }
-
-                    // 计算该单元格覆盖的所有行的总高度
-                    let totalHeight = 0;
-                    for (let i = startRowIndex; i < Math.min(startRowIndex + rowspan, allRows.length); i++) {
-                        totalHeight += allRows[i].offsetHeight;
-                    }
-
-                    // 如果高度为0，说明还未渲染完成
-                    if (totalHeight === 0) {
-                        allSynced = false;
-                        return;
-                    }
-
-                    // 设置当前容器的高度
-                    container.style.height = totalHeight + 'px';
-                });
-
-                return allSynced;
+            // 打印前调整分隔线高度
+            const adjustDividerHeight = () => {
+                const divider = document.querySelector('.kpi-divider');
+                const cell = divider?.closest('td');
+                if (divider && cell) {
+                    const cellHeight = cell.offsetHeight;
+                    divider.style.height = cellHeight + 'px';
+                }
             };
 
-            // 使用MutationObserver监听DOM变化
-            const observer = new MutationObserver((mutations, obs) => {
-                if (syncKpiContainerHeights()) {
-                    // 成功同步后停止监听
-                    obs.disconnect();
+            window.addEventListener('beforeprint', () => {
+                setTimeout(adjustDividerHeight, 50);
+            });
+
+            window.addEventListener('afterprint', () => {
+                const divider = document.querySelector('.kpi-divider');
+                if (divider) {
+                    divider.style.height = '100%';
                 }
             });
-
-            // 开始监听tableBody的变化
-            observer.observe(document.getElementById('tableBody'), {
-                childList: true,
-                subtree: true
-            });
-
-            // 备用方案：如果500ms后仍未同步成功，强制同步
-            setTimeout(() => {
-                observer.disconnect();
-                syncKpiContainerHeights();
-            }, 500);
-
-            // 窗口大小变化时重新同步
-            window.addEventListener('resize', () => {
-                setTimeout(syncKpiContainerHeights, 100);
-            });
-
-            // 打印前也同步一次
-            window.addEventListener('beforeprint', syncKpiContainerHeights);
         </script>
     </div>
 </body>
