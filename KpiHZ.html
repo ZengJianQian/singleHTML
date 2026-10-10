@@ -391,7 +391,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>广州市阳光天使社会工作服务中心</h1>
+            <h1 id="mainTitle"></h1>
             <div class="header-info"><span id="headerTitle" style="font-size: 22px;"></span></div>
             <div class="header-flex">
                 <span id="checkerInfo"></span>
@@ -430,11 +430,13 @@
                 考核分值: 50,
             }]
             const month = "2026年6月";
-            const stand = "石楼社工站"
+            const stand = "石楼社工站";
+            const header = "广州市阳光天使社会工作服务中心"
         </script>
         <!-- 导入页面数据 -->
         <script>
             const title = month + '（' + (stand || "") + '）' + '月度考核汇总表';
+            document.getElementById('mainTitle').textContent = header || "广州市阳光天使社会工作服务中心";
             document.getElementById('headerTitle').textContent = title;
         </script>
         <div id="tableContainer"></div>
