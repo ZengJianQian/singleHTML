@@ -901,7 +901,7 @@
                         format: 'a4'
                     });
 
-                    // 步骤8：智能分页 - 避免在表格行中间分页
+                    // 步骤8：智能分页 - 避免在表格行中间分页，特别避免在第五列（完成情况）单元格中部断页
                     // 获取所有表格行的位置信息
                     const rowBoundaries = []; // 存储每行的起始和结束位置（相对于容器）
                     const allTables = element.querySelectorAll('table');
@@ -917,15 +917,145 @@
                         });
                     });
 
-                    // 计算安全分页点（在行与行之间分页）
-                    function findSafeBreakPoint(targetY) {
-                        // 如果目标位置在某个行内，调整到该行的底部
+                    // 记录所有重要区块的边界（避免在这些区块内部分页）
+                    const blockBoundaries = [];
+
+                    // 1. 记录头部区域
+                    const header = element.querySelector('.header');
+                    if (header) {
+                        const headerRect = header.getBoundingClientRect();
+                        blockBoundaries.push({
+                            top: headerRect.top - containerRect.top + element.scrollTop,
+                            bottom: headerRect.top - containerRect.top + element.scrollTop + headerRect.height,
+                            type: 'header'
+                        });
+                    }
+
+                    // 2. 记录签名区域
+                    const signatureSection = element.querySelector('.signature-section');
+                    if (signatureSection) {
+                        const sigRect = signatureSection.getBoundingClientRect();
+                        blockBoundaries.push({
+                            top: sigRect.top - containerRect.top + element.scrollTop,
+                            bottom: sigRect.top - containerRect.top + element.scrollTop + sigRect.height,
+                            type: 'signature'
+                        });
+                    }
+
+                    // 3. 记录说明区域（底部notes table）
+                    const notesTable = element.querySelector('.notes-table');
+                    if (notesTable) {
+                        const notesRect = notesTable.getBoundingClientRect();
+                        blockBoundaries.push({
+                            top: notesRect.top - containerRect.top + element.scrollTop,
+                            bottom: notesRect.top - containerRect.top + element.scrollTop + notesRect.height,
+                            type: 'notes'
+                        });
+                    }
+
+                    // 4. 记录底部签名确认区域
+                    const bottomSignatureDivs = element.querySelectorAll('div[style*="margin-top"]');
+                    bottomSignatureDivs.forEach(div => {
+                        if (div.textContent.includes('本人已知悉')) {
+                            const bottomRect = div.getBoundingClientRect();
+                            blockBoundaries.push({
+                                top: bottomRect.top - containerRect.top + element.scrollTop,
+                                bottom: bottomRect.top - containerRect.top + element.scrollTop + bottomRect.height,
+                                type: 'bottom-signature'
+                            });
+                        }
+                    });
+
+                    // 记录所有单元格的实际渲染边界
+                    // 这些单元格可能带有rowspan，会跨越多行，需要确保不在其中部断页
+                    const allCellBoundaries = [];
+                    allTables.forEach(table => {
+                        const rows = table.querySelectorAll('tr');
+                        // 追踪每个rowspan单元格的影响范围
+                        const rowspanTracking = []; // 记录当前行中哪些列被rowspan占据
+
+                        rows.forEach((row, rowIndex) => {
+                            const cells = row.querySelectorAll('th, td');
+                            let colIndex = 0;
+
+                            // 先处理rowspan追踪：检查上一行的rowspan是否延伸到当前行
+                            for (let i = 0; i < rowspanTracking.length; i++) {
+                                if (rowspanTracking[i]) {
+                                    rowspanTracking[i].remainingRows--;
+                                    if (rowspanTracking[i].remainingRows <= 0) {
+                                        rowspanTracking[i] = null;
+                                    }
+                                }
+                            }
+
+                            cells.forEach(cell => {
+                                // 跳过被rowspan占据的列
+                                while (colIndex < rowspanTracking.length && rowspanTracking[colIndex]) {
+                                    colIndex++;
+                                }
+
+                                const cellRect = cell.getBoundingClientRect();
+                                const cellTop = cellRect.top - containerRect.top + element.scrollTop;
+                                const cellBottom = cellTop + cellRect.height;
+                                const rowspan = parseInt(cell.getAttribute('rowspan')) || 1;
+
+                                // 记录所有单元格的完整边界
+                                allCellBoundaries.push({
+                                    top: cellTop,
+                                    bottom: cellBottom,
+                                    height: cellRect.height,
+                                    rowspan: rowspan
+                                });
+
+                                // 如果有rowspan，记录其影响范围
+                                if (rowspan > 1) {
+                                    rowspanTracking[colIndex] = {
+                                        remainingRows: rowspan - 1,
+                                        bottom: cellBottom
+                                    };
+                                }
+
+                                colIndex++;
+                            });
+                        });
+                    });
+
+                    // 计算安全分页点（优先避免所有单元格被拆分到两页，同时避免在其他重要区块内部分页）
+                    function findSafeBreakPoint(targetY, pageStartY) {
+                        // 优先级1：检查是否在任何单元格内部（最高优先级）
+                        for (const cell of allCellBoundaries) {
+                            if (targetY > cell.top + 2 && targetY < cell.bottom - 2) {
+                                // 在单元格内部
+                                // 方案：将分页点调整到单元格顶部，让单元格完整出现在下一页
+                                const newBreakY = cell.top;
+
+                                // 检查：如果调整后当前页内容太少（小于页面高度的30%），则允许在单元格底部分页
+                                const minPageHeight = contentHeightPx * 0.3;
+                                if (newBreakY - pageStartY < minPageHeight) {
+                                    // 当前页内容太少，允许在单元格底部分页
+                                    return cell.bottom;
+                                }
+
+                                return newBreakY;
+                            }
+                        }
+
+                        // 优先级2：检查是否在重要区块内部（header、签名区、说明区等）
+                        for (const block of blockBoundaries) {
+                            if (targetY > block.top + 2 && targetY < block.bottom - 2) {
+                                // 在区块内部，调整到区块底部
+                                return block.bottom;
+                            }
+                        }
+
+                        // 优先级3：检查是否在普通行内部
                         for (const row of rowBoundaries) {
-                            if (targetY > row.top && targetY < row.bottom) {
+                            if (targetY > row.top + 2 && targetY < row.bottom - 2) {
                                 return row.bottom; // 移到行底部
                             }
                         }
-                        return targetY; // 不在任何行内，直接返回
+
+                        return targetY; // 不在任何单元格或行内，直接返回
                     }
 
                     // 重新计算分页位置
@@ -936,8 +1066,8 @@
                     while (currentY < imgHeight) {
                         let breakY = currentY + contentHeightPx;
                         if (breakY < imgHeight) {
-                            // 找到安全的分页点
-                            breakY = findSafeBreakPoint(breakY);
+                            // 找到安全的分页点（传入当前页起始位置用于最小高度检查）
+                            breakY = findSafeBreakPoint(breakY, currentY);
                             // 确保不会跳过太多内容（最多允许跳过一行的高度）
                             if (breakY - currentY > contentHeightPx * 1.5) {
                                 breakY = currentY + contentHeightPx;
@@ -1333,7 +1463,7 @@
 
                 if (!thirdColWidth || !fourthColWidth) return;
 
-                const leftPercent = (fourthColWidth * kpiPercent / thirdColWidth) + 101;
+                const leftPercent = (fourthColWidth * kpiPercent / thirdColWidth) + 100;
 
                 dividers.forEach(divider => {
                     divider.style.left = `${leftPercent}%`;
@@ -1632,7 +1762,7 @@
                             const taskCellStyle = (kpiCount > 0 && c === 0 && t === 0) ?
                                 'style="position: relative;"' : '';
                             const dividerHTML = (kpiCount > 0 && c === 0 && t === 0) ?
-                                `<div class="kpi-divider" style="position: absolute; left: 199%; top: 0; bottom: 0; width: 1px; background-color: #333; z-index: 1;"></div>` : '';
+                                `<div class="kpi-divider" style="position: absolute; left: 197%; top: 0; bottom: 0; width: 1px; background-color: #333; z-index: 1;"></div>` : '';
                             // KPI细项的中线设置 
                             if (taskRowspan > 1) {
                                 rowHTML += `<td class="task-name" rowspan="${taskRowspan}" ${taskCellStyle}>${taskCellContent}${dividerHTML}</td>`;
